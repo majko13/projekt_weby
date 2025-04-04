@@ -14,7 +14,7 @@
         <section class="registration-form">
             <h1>Register</h1>
             <form action="after-registration.php" method="POST">
-                <input class="reg-input" type="text" name="second-name" placeholder="Name"><br>
+                <input class="reg-input" type="text" name="username" placeholder="Name"><br>
                 <input class="reg-input password-first" type="password" name="password" placeholder="Password"><br>
                 <input class="reg-input password-second" type="password" name="password-again" placeholder="Password again"><br>
                 <input class="btn" type="submit" value="Register">

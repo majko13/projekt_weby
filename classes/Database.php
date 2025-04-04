@@ -6,7 +6,7 @@ class Database {
         $db_host = "127.0.0.1";
         $db_user = "majko";
         $db_password = "majko1122";
-        $db_name = "ukol";
+        $db_name = "databaze";
         
         $connection = "mysql:host=" . $db_host . ";dbname=" . $db_name . ";charset=utf8";
 

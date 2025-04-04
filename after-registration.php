@@ -1,38 +1,47 @@
 <?php
+    
+    require "./classes/Database.php";
+    require "./assets/user.php";
 
-// require "../assets/url.php";
-// require "../assets/database.php";
-// require "../assets/user.php";
-require "./classes/Database.php";
-require "./classes/Url.php";
-require "./classes/User.php";
+    $username = null;
+    $password = null;
+    $role =  null;
+    $created_at = null;
 
-session_start();
+    if($_SERVER["REQUEST_METHOD"]==="POST"){
 
-if($_SERVER["REQUEST_METHOD"] === "POST") {
+        
+        $username = $_POST["username"];
+        $password = $_POST["password"];
 
-    // $connection = connectionDB();
-    $database = new Database();
-    $connection = $database->connectionDB();
+        // $errors = [];
+        // if($_POST["first_name"]===""){
+        //     $errors[] = "Křestni jmeno je povinne";
+        // }
+        // if($_POST["second_name"]===""){
+        //     $errors[] = "Prijmeni je povinne";
+        // }
+        // if(empty( $errors[])){
 
-    $username = $_POST["username"];
-    $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
+        // $connection = databaseConnection();
+        $database  = new Database();
+        $connection = $database->connectionDB();
 
-    $id = User::createUser($connection, $first_name, $second_name,$email, $password);
-
-    if(!empty($id)){
-        // Zabraňuje provedení tzv. fixation attack. Více zde: https://owasp.org/www-community/attacks/Session_fixation
-        session_regenerate_id(true);
-
-        // Nastavení, že je uživatel přihlášený
-        $_SESSION["is_logged_in"] = true;
-        // Nastavení ID uživatele
-        $_SESSION["logged_in_user_id"] = $id;
-
-        // Url::redirectUrl("/setek/admin/zaci.php");
-    } else {
-        echo "Uživatele se nepodařilo přidat";
+        createStudent($connection, $username,$password);
+        
+        // }
+        // $result  = mysqli_query($connection, $sql);
+        
+        // if($result === false)
+        // {
+        //     echo mysqli_error($connection);
+        // }
+        // else
+        // {
+        //     $id =mysqli_insert_id($connection);
+            
+        //     echo "Uspesne vlozeno zak = ".$id;
+        // }
     }
-} else {
-    echo "Nepovolený přístup";
-}
+
+?>
