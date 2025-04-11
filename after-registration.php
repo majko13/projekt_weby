@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["logged_in_user_id"] = $userId;
         $_SESSION["user_name"] = $name;
         $_SESSION["user_email"] = $email;
-        $_SESSION["user_role"] = 'admin'; // Default role
+        $_SESSION["user_role"] = ''; // Default role
         
         $database->closeConnection();
         header("Location: dashboard.php");
