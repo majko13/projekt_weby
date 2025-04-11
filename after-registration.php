@@ -3,7 +3,10 @@ require "./classes/Database.php";
 require "./classes/Url.php";
 require "./classes/User.php";
 
-session_start();
+    $username = null;
+    $password = null;
+    $role =  null;
+    $created_at = null;
 
 if($_SERVER["REQUEST_METHOD"] === "POST") {
     $database = new Database();
