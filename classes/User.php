@@ -1,14 +1,13 @@
 <?php
 class User {
-    public static function createUser($connection, $firstName, $secondName, $email, $password) {
-        $sql = "INSERT INTO users (first_name, second_name, email, password) 
-                VALUES (:first_name, :second_name, :email, :password)";
+    public static function createUser($connection, $name, $email, $password) {
+        $sql = "INSERT INTO users (name, email, password) 
+                VALUES (:name, :email, :password)";
         
         try {
             $stmt = $connection->prepare($sql);
             $stmt->execute([
-                ':first_name' => $firstName,
-                ':second_name' => $secondName,
+                ':name' => $name,
                 ':email' => $email,
                 ':password' => $password
             ]);
@@ -22,7 +21,7 @@ class User {
     }
 
     public static function authenticate($connection, $email, $password) {
-        $sql = "SELECT id, password FROM users WHERE email = :email";
+        $sql = "SELECT id, name, password FROM users WHERE email = :email";
         
         try {
             $stmt = $connection->prepare($sql);
@@ -30,7 +29,7 @@ class User {
             $user = $stmt->fetch();
             
             if ($user && password_verify($password, $user['password'])) {
-                return $user['id'];
+                return $user;
             }
             return false;
             
@@ -41,7 +40,7 @@ class User {
     }
 
     public static function getUserById($connection, $userId) {
-        $sql = "SELECT first_name, second_name FROM users WHERE id = :id";
+        $sql = "SELECT name, email FROM users WHERE id = :id";
         
         try {
             $stmt = $connection->prepare($sql);

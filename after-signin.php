@@ -12,17 +12,15 @@ if($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
     $password = $_POST["password"];
 
-    $userId = User::authenticate($connection, $email, $password);
+    $user = User::authenticate($connection, $email, $password);
 
-    if($userId) {
+    if($user) {
         session_regenerate_id(true);
         
-        // Get user info
-        $user = User::getUserById($connection, $userId);
-        
         $_SESSION["is_logged_in"] = true;
-        $_SESSION["logged_in_user_id"] = $userId;
-        $_SESSION["user_name"] = $user['first_name'] . " " . $user['second_name'];
+        $_SESSION["logged_in_user_id"] = $user['id'];
+        $_SESSION["user_name"] = $user['name'];
+        $_SESSION["user_email"] = $email;
         
         $database->closeConnection();
         Url::redirectUrl("/dashboard.php");

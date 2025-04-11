@@ -34,7 +34,7 @@ if (!$user) {
 
     <main>
         <section class="dashboard">
-            <h1>Welcome, <?php echo htmlspecialchars($user['first_name'] . " " . $user['second_name']); ?>!</h1>
+            <h1>Welcome, <?php echo htmlspecialchars($user['name']); ?>!</h1>
             <p>You are now logged in.</p>
             <p>Email: <?php echo htmlspecialchars($_SESSION['user_email'] ?? ''); ?></p>
             <a href="logout.php" class="btn">Logout</a>
