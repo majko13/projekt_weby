@@ -23,7 +23,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["user_email"] = $email;
         
         $database->closeConnection();
-        Url::redirectUrl("/dashboard.php");
+        Url::redirectUrl("/projekt_weby/dashboard.php");
     } else {
         $database->closeConnection();
         echo "Invalid email or password";
