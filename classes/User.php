@@ -1,77 +1,57 @@
 <?php
-
 class User {
-
-    public static function createUser($connection, $username, $password) {
-
-        $sql = "INSERT INTO users (username, password, password) 
-        VALUES (:username, :password)";
-
-        $stmt = $connection->prepare($sql);
-
-        $stmt->bindValue(":username", $username, PDO::PARAM_STR);
-        $stmt->bindValue(":password", $password, PDO::PARAM_STR);
-
+    public static function createUser($connection, $firstName, $secondName, $email, $password) {
+        $sql = "INSERT INTO users (first_name, second_name, email, password) 
+                VALUES (:first_name, :second_name, :email, :password)";
+        
         try {
-            if($stmt->execute()) {
-                $id = $connection->lastInsertId();
-                return $id;
-            } else {
-                throw new Exception("Vytvoření uživatele selhalo"); 
-            }
-        } catch (Exception $e) {
-            error_log("Chyba u funkce createUser\n", 3, "../errors/error.log");
-            echo "Typ chyby: " . $e->getMessage();
-        }    
+            $stmt = $connection->prepare($sql);
+            $stmt->execute([
+                ':first_name' => $firstName,
+                ':second_name' => $secondName,
+                ':email' => $email,
+                ':password' => $password
+            ]);
+            
+            return $connection->lastInsertId();
+            
+        } catch (PDOException $e) {
+            error_log("Error creating user: " . $e->getMessage());
+            return false;
+        }
     }
 
-
-    public static function authentication($connection, $log_name, $log_password) {
-        $sql = "SELECT password
-                FROM users
-                WHERE username = :username";
-    
-        $stmt = $connection->prepare($sql);
-
-      
-        $stmt->bindValue(":email", $log_name, PDO::PARAM_STR);
-
+    public static function authenticate($connection, $email, $password) {
+        $sql = "SELECT id, password FROM users WHERE email = :email";
+        
         try {
-            if($stmt->execute()){
-                if ($user = $stmt->fetch()){
-                    return password_verify($log_password, $user[0]);
-                }
-            } else {
-                throw new Exception("Autentikace se nezdařila");
+            $stmt = $connection->prepare($sql);
+            $stmt->execute([':email' => $email]);
+            $user = $stmt->fetch();
+            
+            if ($user && password_verify($password, $user['password'])) {
+                return $user['id'];
             }
-        } catch (Exception $e) {
-            error_log("Chyba u funkce authentication\n", 3, "../errors/error.log");
-            echo "Typ chyby: " . $e->getMessage();
-        }  
+            return false;
+            
+        } catch (PDOException $e) {
+            error_log("Authentication error: " . $e->getMessage());
+            return false;
+        }
     }
 
-
-    public static function getUserId($connection, $username){
-        $sql = "SELECT id FROM users
-                WHERE username = :username";
-
-        $stmt = $connection->prepare($sql);
-        $stmt->bindValue(":username", $username, PDO::PARAM_STR);
-
+    public static function getUserById($connection, $userId) {
+        $sql = "SELECT first_name, second_name FROM users WHERE id = :id";
+        
         try {
-            if($stmt->execute()){
-                $result = $stmt->fetch();
-                $user_id = $result[0];
-                return $user_id;
-            } else {
-                throw new Exception("Získání ID uživatele selhalo");
-            }
-        } catch (Exception $e) {
-            error_log("Chyba u funkce getUserId\n", 3, "../errors/error.log");
-            echo "Typ chyby: " . $e->getMessage();
-        }       
+            $stmt = $connection->prepare($sql);
+            $stmt->execute([':id' => $userId]);
+            return $stmt->fetch();
+            
+        } catch (PDOException $e) {
+            error_log("Error fetching user: " . $e->getMessage());
+            return false;
+        }
     }
 }
-
-
-
+?>

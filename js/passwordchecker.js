@@ -1,41 +1,28 @@
-const password1 = document.querySelector(".password-first")
-const password2 = document.querySelector(".password-second")
-const paragraphText = document.querySelector(".result-text")
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordFirst = document.querySelector('.password-first');
+    const passwordSecond = document.querySelector('.password-second');
+    const resultText = document.querySelector('.result-text');
+    const form = document.querySelector('form');
 
-password1.addEventListener("input", () => {
-    const password1Value = password1.value
-    const password2Value = password2.value
-    
-    if (password1Value === password2Value){
-        paragraphText.textContent = "Hesla jsou shodná"
-        paragraphText.classList.add("valid")
-        paragraphText.classList.remove("invalid")
-    } else {
-        paragraphText.textContent = "Hesla nejsou shodná"
-        paragraphText.classList.add("invalid")
-        paragraphText.classList.remove("valid")
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (passwordFirst.value !== passwordSecond.value) {
+                e.preventDefault();
+                resultText.textContent = 'Passwords do not match!';
+                resultText.style.color = 'red';
+            }
+        });
     }
 
-    if (password1Value === "" && password2Value === ""){
-        paragraphText.textContent = ""
+    if (passwordSecond) {
+        passwordSecond.addEventListener('input', function() {
+            if (passwordFirst.value === passwordSecond.value) {
+                resultText.textContent = 'Passwords match!';
+                resultText.style.color = 'green';
+            } else {
+                resultText.textContent = 'Passwords do not match!';
+                resultText.style.color = 'red';
+            }
+        });
     }
-})
-
-password2.addEventListener("input", () => {
-    const password1Value = password1.value
-    const password2Value = password2.value
-
-    if (password1Value === password2Value) {
-        paragraphText.textContent = "Hesla jsou shodná"
-        paragraphText.classList.add("valid")
-        paragraphText.classList.remove("invalid")
-    } else {
-        paragraphText.textContent = "Hesla nejsou shodná"
-        paragraphText.classList.add("invalid")
-        paragraphText.classList.remove("valid")
-    }
-
-    if (password1Value === "" && password2Value === "") {
-        paragraphText.textContent = ""
-    }
-})
+});
