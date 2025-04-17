@@ -7,6 +7,7 @@ $isLoggedIn = $_SESSION['is_logged_in'] ?? false;
     <ul>
         <?php if ($isLoggedIn): ?>
             <li><a href="dashboard.php">Dashboard</a></li>
+            <li><a href="classes.php">Classes</a></li>
             <?php if ($userRole === 'admin'): ?>
                 <li><a href="admin.php">Admin Panel</a></li>
             <?php endif; ?>
