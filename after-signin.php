@@ -21,6 +21,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["logged_in_user_id"] = $user['id'];
         $_SESSION["user_name"] = $user['name'];
         $_SESSION["user_email"] = $email;
+        $_SESSION["user_role"] = $user['role'] ?? 'readonly';
         
         $database->closeConnection();
         Url::redirectUrl("/projekt_weby/dashboard.php");

@@ -1,21 +1,10 @@
 <?php
-
-
-
 session_start();
 
 // Include required classes at the top of the file
 require __DIR__ . '/classes/Database.php';
 require __DIR__ . '/classes/User.php';
 require __DIR__ . '/classes/Url.php';
-
-// At the top of dashboard.php
-if ($_SESSION["user_role"] === 'readonly') {
-    // Show limited functionality
-    echo "<p>Your account is readonly. Please contact admin for full access.</p>";
-} elseif ($_SESSION["user_role"] === 'customer') {
-    // Show customer features
-} // etc.
 
 // Redirect to login if not authenticated
 if (!isset($_SESSION["is_logged_in"]) || !$_SESSION["is_logged_in"]) {
@@ -33,6 +22,17 @@ if (!$user) {
     header("Location: signin.php");
     exit;
 }
+
+// Set role in session if not already set
+$_SESSION['role'] = $user['role'] ?? 'readonly';
+
+// Check role after it's properly set
+if ($_SESSION["role"] === 'readonly') {
+    // Show limited functionality
+    echo "<p>Your account is readonly. Please contact admin for full access.</p>";
+} elseif ($_SESSION["role"] === 'customer') {
+    // Show customer features
+} // etc.
 ?>
 <!DOCTYPE html>
 <html lang="en">
