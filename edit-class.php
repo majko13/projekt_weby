@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/classes/Database.php';
-require __DIR__ . '/classes/ClassItem.php';
+require __DIR__ . '/classes/Class.php';
 
 session_start();
 

@@ -41,3 +41,13 @@
     border-radius: 4px;
     min-height: 100px;
 }
+
+.reserved {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.available {
+    color: #5cb85c;
+    font-weight: bold;
+}
