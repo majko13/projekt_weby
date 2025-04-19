@@ -107,5 +107,37 @@ class ClassItem {
         $stmt->execute(['class_id' => $class_id, 'date' => $date]);
         return $stmt->fetchColumn() > 0;
     }
+
+    public static function getUserReservationCount(PDO $connection, int $user_id, int $class_id, int $month, int $year): int {
+        $start_date = "$year-$month-01";
+        $end_date = "$year-$month-" . cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        
+        $sql = "SELECT COUNT(*) FROM reservations 
+                WHERE user_id = :user_id 
+                AND class_id = :class_id
+                AND reservation_date BETWEEN :start_date AND :end_date";
+        
+        $stmt = $connection->prepare($sql);
+        $stmt->execute([
+            'user_id' => $user_id,
+            'class_id' => $class_id,
+            'start_date' => $start_date,
+            'end_date' => $end_date
+        ]);
+        
+        return (int)$stmt->fetchColumn();
+    }
+    
+    public static function getUserReservations(PDO $connection, int $user_id): array {
+        $sql = "SELECT r.*, c.name as class_name 
+                FROM reservations r
+                JOIN classes c ON r.class_id = c.class_id
+                WHERE r.user_id = :user_id
+                ORDER BY r.reservation_date DESC";
+        
+        $stmt = $connection->prepare($sql);
+        $stmt->execute(['user_id' => $user_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

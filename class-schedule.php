@@ -90,16 +90,36 @@ $database->closeConnection();
         }
         .reservation-available {
             background: #e6f7e6;
-            cursor: pointer;
         }
         .reservation-booked {
             background: #ffebeb;
         }
-        .reservation-link {
-            display: block;
-            height: 100%;
-            text-decoration: none;
-            color: inherit;
+        .past-day {
+            background-color: #f9f9f9;
+            color: #ccc;
+        }
+        .weekend-day {
+            background-color: #fff3cd;
+        }
+        .reservation-form {
+            margin-top: 5px;
+        }
+        .reserve-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .reserve-btn:hover {
+            background: #45a049;
+        }
+        .reservation-info {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
         }
         .month-nav {
             display: flex;
@@ -112,6 +132,16 @@ $database->closeConnection();
 
     <main>
         <section class="calendar">
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="alert success"><?= htmlspecialchars($_SESSION['success']) ?></div>
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
+            
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert error"><?= htmlspecialchars($_SESSION['error']) ?></div>
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
+            
             <div class="calendar-header">
                 <h1><?= htmlspecialchars($class['name']) ?> - Schedule</h1>
                 <p><?= htmlspecialchars($class['description']) ?></p>
@@ -162,22 +192,41 @@ $database->closeConnection();
                 
                 // Days of the month
                 for ($day = 1; $day <= $days_in_month; $day++) {
-                    $current_date = "$year-$month-$day";
+                    $current_date = "$year-$month-" . str_pad($day, 2, '0', STR_PAD_LEFT);
                     $is_past = strtotime($current_date) < strtotime(date('Y-m-d'));
                     $is_reserved = isset($reservations[$current_date]);
+                    $is_weekend = date('N', strtotime($current_date)) >= 6; // Saturday or Sunday
                     
-                    $cell_class = $is_past ? 'day-cell past-day' : 'day-cell';
-                    $cell_class .= $is_reserved ? ' reservation-booked' : ' reservation-available';
+                    $cell_class = 'day-cell';
+                    if ($is_past) {
+                        $cell_class .= ' past-day';
+                    } elseif ($is_reserved) {
+                        $cell_class .= ' reservation-booked';
+                    } elseif ($is_weekend) {
+                        $cell_class .= ' weekend-day';
+                    } else {
+                        $cell_class .= ' reservation-available';
+                    }
                     
                     echo '<div class="' . $cell_class . '">';
                     echo '<div class="day-number">' . $day . '</div>';
                     
-                    if (!$is_past && !$is_reserved && ($_SESSION['user_role'] === 'customer' || $_SESSION['user_role'] === 'verification')) {
-                        echo '<a href="make-reservation.php?class_id=' . $class_id . '&date=' . $current_date . '" class="reservation-link"></a>';
+                    if (!$is_past && !$is_reserved && !$is_weekend && 
+                        ($_SESSION['user_role'] === 'customer' || $_SESSION['user_role'] === 'verification')) {
+                        // Add a form to handle reservation
+                        echo '<form method="POST" action="process-reservation.php" class="reservation-form">';
+                        echo '<input type="hidden" name="class_id" value="' . $class_id . '">';
+                        echo '<input type="hidden" name="date" value="' . $current_date . '">';
+                        echo '<button type="submit" class="reserve-btn">Reserve</button>';
+                        echo '</form>';
                     }
                     
                     if ($is_reserved) {
                         echo '<div class="reservation-info">Booked</div>';
+                    }
+                    
+                    if ($is_weekend) {
+                        echo '<div class="reservation-info">Closed</div>';
                     }
                     
                     echo '</div>';
