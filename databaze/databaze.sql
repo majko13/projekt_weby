@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hostiteľ: 127.0.0.1
--- Čas generovania: So 26.Apr 2025, 15:03
+-- Čas generovania: So 26.Apr 2025, 16:04
 -- Verzia serveru: 10.4.32-MariaDB
 -- Verzia PHP: 8.2.12
 
@@ -53,7 +53,7 @@ CREATE TABLE `class_reservations` (
   `reservation_id` int(11) NOT NULL,
   `class_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `reservation_date` datetime NOT NULL,
+  `date` datetime NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

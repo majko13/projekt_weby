@@ -73,36 +73,12 @@ class ClassItem {
 
     
     
-    public static function getClassReservations(PDO $connection, int $class_id, int $month, int $year): array {
-        $start_date = "$year-$month-01";
-        $end_date = "$year-$month-" . cal_days_in_month(CAL_GREGORIAN, $month, $year);
-        
-        $sql = "SELECT DATE(reservation_date) as reservation_day 
-                FROM class_reservations
-                WHERE class_id = :class_id 
-                AND reservation_date BETWEEN :start_date AND :end_date";
-        
-        $stmt = $connection->prepare($sql);
-        $stmt->execute([
-            'class_id' => $class_id,
-            'start_date' => $start_date,
-            'end_date' => $end_date
-        ]);
-        
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        $reservations = [];
-        foreach ($result as $row) {
-            $reservations[$row['reservation_day']] = true;
-        }
-        
-        return $reservations;
-    }
+   
 
     public static function isClassReservedForDate(PDO $connection, int $class_id, string $date): bool {
-        $sql = "SELECT COUNT(*) FROM reservations 
+        $sql = "SELECT COUNT(*) FROM class_reservations 
                 WHERE class_id = :class_id 
-                AND DATE(reservation_date) = :date";
+                AND DATE(date) = :date";
         $stmt = $connection->prepare($sql);
         $stmt->execute(['class_id' => $class_id, 'date' => $date]);
         return $stmt->fetchColumn() > 0;
@@ -112,10 +88,10 @@ class ClassItem {
         $start_date = "$year-$month-01";
         $end_date = "$year-$month-" . cal_days_in_month(CAL_GREGORIAN, $month, $year);
         
-        $sql = "SELECT COUNT(*) FROM reservations 
+        $sql = "SELECT COUNT(*) FROM class_reservations 
                 WHERE user_id = :user_id 
                 AND class_id = :class_id
-                AND reservation_date BETWEEN :start_date AND :end_date";
+                AND date BETWEEN :start_date AND :end_date";
         
         $stmt = $connection->prepare($sql);
         $stmt->execute([
@@ -130,14 +106,53 @@ class ClassItem {
     
     public static function getUserReservations(PDO $connection, int $user_id): array {
         $sql = "SELECT r.*, c.name as class_name 
-                FROM reservations r
+                FROM class_reservations r
                 JOIN classes c ON r.class_id = c.class_id
                 WHERE r.user_id = :user_id
-                ORDER BY r.reservation_date DESC";
+                ORDER BY r.date DESC";
         
         $stmt = $connection->prepare($sql);
         $stmt->execute(['user_id' => $user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public static function createReservation($connection, $class_id, $user_id, $date) {
+        try {
+            $sql = "INSERT INTO class_reservations (class_id, user_id, date) 
+                    VALUES (:class_id, :user_id, :date)";
+            $stmt = $connection->prepare($sql);
+            
+            $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->bindParam(':date', $date, PDO::PARAM_STR);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Reservation Error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public static function getClassReservations($connection, $class_id, $month, $year) {
+        $start_date = "$year-$month-01";
+        $end_date = date("Y-m-t", strtotime($start_date));
+        
+        $sql = "SELECT DATE(date) as date, user_id 
+                FROM class_reservations 
+                WHERE class_id = :class_id 
+                AND date BETWEEN :start_date AND :end_date";
+        
+        $stmt = $connection->prepare($sql);
+        $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
+        $stmt->bindParam(':start_date', $start_date, PDO::PARAM_STR);
+        $stmt->bindParam(':end_date', $end_date, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $reservations = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $reservations[$row['date']] = $row;
+        }
+        
+        return $reservations;
     }
 }
 ?>

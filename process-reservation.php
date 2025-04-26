@@ -1,30 +1,28 @@
+// In process-reservation.php (simplified example)
 <?php
-require __DIR__ . '/classes/Database.php';
-require __DIR__ . '/classes/Class.php';
-require __DIR__ . '/classes/User.php';
-
 session_start();
 
-if (!isset($_SESSION["is_logged_in"]) || ($_SESSION['user_role'] !== 'customer' && $_SESSION['user_role'] !== 'verification')) {
+if (!isset($_SESSION["is_logged_in"])) {
     header("Location: signin.php");
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['class_id']) || !isset($_POST['date'])) {
-    $_SESSION['error'] = "Invalid request";
+if (!isset($_GET['class_id']) || !isset($_GET['date'])) {
     header("Location: classes.php");
     exit;
 }
 
-$class_id = $_POST['class_id'];
-$date = $_POST['date'];
-$user_id = $_SESSION['user_id'];
+require __DIR__ . '/classes/Database.php';
+require __DIR__ . '/classes/Class.php';
+
+$class_id = $_GET['class_id'];
+$date = $_GET['date'];
 
 $database = new Database();
 $connection = $database->connectionDB();
 
 try {
-    // Verify class exists
+    // Check if the class exists
     $class = ClassItem::getClassById($connection, $class_id);
     if (!$class) {
         $_SESSION['error'] = "Class not found";
@@ -32,131 +30,43 @@ try {
         exit;
     }
     
-    // Validate date
+    // Check if date is valid and in the future
     if (strtotime($date) < strtotime(date('Y-m-d'))) {
-        $_SESSION['error'] = "Cannot reserve a class in the past";
-        header("Location: class-schedule.php?class_id=$class_id");
+        $_SESSION['error'] = "Cannot reserve for past dates";
+        header("Location: class-schedule.php?class_id=" . $class_id);
         exit;
     }
     
-    // Check if weekend
+    // Check if date is a weekend
     if (date('N', strtotime($date)) >= 6) {
-        $_SESSION['error'] = "Cannot reserve classes on weekends";
-        header("Location: class-schedule.php?class_id=$class_id");
+        $_SESSION['error'] = "Cannot reserve on weekends";
+        header("Location: class-schedule.php?class_id=" . $class_id);
         exit;
     }
     
     // Check if already reserved
-    if (ClassItem::isClassReser<?php
-    require __DIR__ . '/classes/Database.php';
-    require __DIR__ . '/classes/ClassItem.php';
-    require __DIR__ . '/classes/User.php';
-    
-    session_start();
-    
-    // 1. Check if user is logged in and has permission
-    if (!isset($_SESSION["is_logged_in"]) || ($_SESSION['user_role'] !== 'customer' && $_SESSION['user_role'] !== 'verification')) {
-        $_SESSION['error'] = "Please log in to reserve classes";
-        header("Location: signin.php");
+    $reservations = ClassItem::getClassReservations($connection, $class_id, date('n', strtotime($date)), date('Y', strtotime($date)));
+    if (isset($reservations[$date])) {
+        $_SESSION['error'] = "This date is already booked";
+        header("Location: class-schedule.php?class_id=" . $class_id);
         exit;
     }
     
-    // 2. Validate the request
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['class_id']) || !isset($_POST['date'])) {
-        $_SESSION['error'] = "Invalid reservation request";
-        header("Location: classes.php");
-        exit;
-    }
-    
-    $class_id = $_POST['class_id'];
-    $date = $_POST['date'];
+    // Create reservation
     $user_id = $_SESSION['user_id'];
+    $success = ClassItem::createReservation($connection, $class_id, $user_id, $date);
     
-    $database = new Database();
-    $connection = $database->connectionDB();
-    
-    try {
-        // 3. Verify class exists
-        $class = ClassItem::getClassById($connection, $class_id);
-        if (!$class) {
-            $_SESSION['error'] = "Class not found";
-            header("Location: classes.php");
-            exit;
-        }
-        
-        // 4. Validate date (not past or weekend)
-        if (strtotime($date) < strtotime(date('Y-m-d'))) {
-            $_SESSION['error'] = "Cannot reserve classes in the past";
-            header("Location: class-schedule.php?class_id=$class_id");
-            exit;
-        }
-        
-        if (date('N', strtotime($date)) >= 6) {
-            $_SESSION['error'] = "Cannot reserve classes on weekends";
-            header("Location: class-schedule.php?class_id=$class_id");
-            exit;
-        }
-        
-        // 5. Check availability
-        if (ClassItem::isClassReservedForDate($connection, $class_id, $date)) {
-            $_SESSION['error'] = "This class is already booked for the selected date";
-            header("Location: class-schedule.php?class_id=$class_id");
-            exit;
-        }
-        
-        // 6. Create reservation
-        $sql = "INSERT INTO reservations (class_id, user_id, reservation_date, created_at) 
-                VALUES (:class_id, :user_id, :reservation_date, NOW())";
-        $stmt = $connection->prepare($sql);
-        $success = $stmt->execute([
-            'class_id' => $class_id,
-            'user_id' => $user_id,
-            'reservation_date' => $date
-        ]);
-        
-        if ($success) {
-            $_SESSION['success'] = "Successfully reserved " . htmlspecialchars($class['name']) . " for " . date('F j, Y', strtotime($date));
-        } else {
-            $_SESSION['error'] = "Failed to make reservation";
-        }
-        
-        header("Location: class-schedule.php?class_id=$class_id");
-        exit;
-        
-    } catch (PDOException $e) {
-        $_SESSION['error'] = "Database error: " . $e->getMessage();
-        header("Location: class-schedule.php?class_id=$class_id");
-        exit;
-    }vedForDate($connection, $class_id, $date)) {
-        $_SESSION['error'] = "This class is already reserved for the selected date";
-        header("Location: class-schedule.php?class_id=$class_id");
-        exit;
+    if ($success) {
+        $_SESSION['success'] = "Reservation created successfully!";
+    } else {
+        $_SESSION['error'] = "Failed to create reservation";
     }
     
-    // Check if user has already reserved this class too many times this month
-    $reservationCount = ClassItem::getUserReservationCount($connection, $user_id, $class_id, date('m'), date('Y'));
-    if ($reservationCount >= 3) { // Limit to 3 reservations per class per month
-        $_SESSION['error'] = "You've reached the maximum reservations for this class this month";
-        header("Location: class-schedule.php?class_id=$class_id");
-        exit;
-    }
-    
-    // Make reservation
-    $sql = "INSERT INTO reservations (class_id, user_id, reservation_date, created_at) 
-            VALUES (:class_id, :user_id, :reservation_date, NOW())";
-    $stmt = $connection->prepare($sql);
-    $stmt->execute([
-        'class_id' => $class_id,
-        'user_id' => $user_id,
-        'reservation_date' => $date
-    ]);
-    
-    $_SESSION['success'] = "Class successfully reserved for " . date('F j, Y', strtotime($date));
-    header("Location: class-schedule.php?class_id=$class_id");
+    header("Location: class-schedule.php?class_id=" . $class_id);
     exit;
     
 } catch (PDOException $e) {
-    $_SESSION['error'] = "Error making reservation: " . $e->getMessage();
-    header("Location: class-schedule.php?class_id=$class_id");
+    $_SESSION['error'] = "Database error: " . $e->getMessage();
+    header("Location: class-schedule.php?class_id=" . $class_id);
     exit;
 }
