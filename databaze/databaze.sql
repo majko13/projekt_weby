@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hostiteľ: 127.0.0.1
--- Čas generovania: So 26.Apr 2025, 16:04
+-- Čas generovania: So 26.Apr 2025, 16:18
 -- Verzia serveru: 10.4.32-MariaDB
 -- Verzia PHP: 8.2.12
 
@@ -40,8 +40,8 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`class_id`, `name`, `description`, `capacity`, `created_at`) VALUES
-(5, 'aS', 'ASD', 24, '2025-04-19 14:21:38'),
-(6, 'asd', 'asdsa', 28, '2025-04-19 14:34:11');
+(6, 'asd', 'asdsa', 28, '2025-04-19 14:34:11'),
+(7, 'asd', 'asd', 14, '2025-04-26 14:16:33');
 
 -- --------------------------------------------------------
 
@@ -101,8 +101,9 @@ ALTER TABLE `classes`
 --
 ALTER TABLE `class_reservations`
   ADD PRIMARY KEY (`reservation_id`),
-  ADD KEY `class_id` (`class_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `idx_date` (`date`),
+  ADD KEY `fk_class_reservations_user` (`user_id`),
+  ADD KEY `idx_class_date` (`class_id`,`date`);
 
 --
 -- Indexy pre tabuľku `users`
@@ -119,7 +120,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pre tabuľku `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pre tabuľku `class_reservations`
@@ -142,7 +143,9 @@ ALTER TABLE `users`
 --
 ALTER TABLE `class_reservations`
   ADD CONSTRAINT `class_reservations_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`),
-  ADD CONSTRAINT `class_reservations_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `class_reservations_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `fk_class_reservations_class` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_class_reservations_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

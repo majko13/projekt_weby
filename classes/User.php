@@ -2,7 +2,7 @@
 class User {
     public static function createUser($connection, $name, $email, $password) {
         $sql = "INSERT INTO users (name, email, password, role) 
-                VALUES (:name, :email, :password, 'admin')";
+                VALUES (:name, :email, :password, 'readonly')";
         
         try {
             $stmt = $connection->prepare($sql);

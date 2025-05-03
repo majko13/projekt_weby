@@ -14,11 +14,18 @@ if (!isset($_SESSION["is_logged_in"])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reserve_date'])) {
     $class_id = $_POST['class_id'];
     $date = $_POST['reserve_date'];
-    $user_id = $_SESSION['user_id'];
+    $user_id = $_SESSION['logged_in_user_id'];
 
     $database = new Database();
     $connection = $database->connectionDB();
 
+    $existing = ClassItem::getReservationStatus($connection, $class_id, $date);
+    if ($existing === 'approved') {
+        $_SESSION['error'] = "This date is already booked";
+        header("Location: class-schedule.php?class_id=" . $class_id);
+        exit;
+    }
+    
     try {
         // Check if date is valid and in the future
         if (strtotime($date) < strtotime(date('Y-m-d'))) {
@@ -46,10 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reserve_date'])) {
         }
 
         // Create reservation
-        $success = ClassItem::createReservation($connection, $class_id, $user_id, $date);
-
+        $success = ClassItem::createReservation($connection, $class_id, $user_id, $date, 'pending');
+        
         if ($success) {
-            $_SESSION['success'] = "Reservation created successfully for " . date('F j, Y', strtotime($date));
+            $_SESSION['success'] = "Reservation requested! Waiting for approval.";
         } else {
             $_SESSION['error'] = "Failed to create reservation";
         }
@@ -127,6 +134,12 @@ $database->closeConnection();
             min-height: 100px;
             padding: 5px;
             position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .day-cell:hover {
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
         }
         .day-number {
             font-weight: bold;
@@ -140,28 +153,19 @@ $database->closeConnection();
         }
         .reservation-booked {
             background: #ffebeb;
+            cursor: not-allowed;
         }
         .past-day {
             background-color: #f9f9f9;
             color: #ccc;
+            cursor: not-allowed;
         }
         .weekend-day {
             background-color: #fff3cd;
+            cursor: not-allowed;
         }
         .reservation-form {
             margin-top: 5px;
-        }
-        .reserve-btn {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .reserve-btn:hover {
-            background: #45a049;
         }
         .reservation-info {
             font-size: 0.8em;
@@ -172,43 +176,34 @@ $database->closeConnection();
             display: flex;
             gap: 20px;
         }
-
-        .day-cell {
-    border: 1px solid #ddd;
-    min-height: 100px;
-    padding: 5px;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.day-cell:hover {
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    transform: translateY(-2px);
-}
-
-.day-cell.past-day, 
-.day-cell.reservation-booked,
-.day-cell.weekend-day {
-    cursor: not-allowed;
-}
-
-.day-cell.past-day:hover, 
-.day-cell.reservation-booked:hover,
-.day-cell.weekend-day:hover {
-    box-shadow: none;
-    transform: none;
-}
-
-.reservation-link {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: block;
-    text-decoration: none;
-}
+        .day-cell.past-day:hover, 
+        .day-cell.reservation-booked:hover,
+        .day-cell.weekend-day:hover {
+            box-shadow: none;
+            transform: none;
+        }
+        .pending-approval {
+            background-color: #fff3cd;
+        }
+        .requested-by-other {
+            background-color: #ffeeba;
+        }
+        .approval-form {
+            margin-top: 5px;
+        }
+        .approve-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.8em;
+        }
+        .approve-btn:hover {
+            background: #218838;
+        }
     </style>
 </head>
 <body>
@@ -260,80 +255,125 @@ $database->closeConnection();
             <?php endif; ?>
             
             <div class="calendar-grid">
-    <!-- Day headers remain the same -->
-    <div class="day-header">Monday</div>
-    <div class="day-header">Tuesday</div>
-    <div class="day-header">Wednesday</div>
-    <div class="day-header">Thursday</div>
-    <div class="day-header">Friday</div>
-    <div class="day-header">Saturday</div>
-    <div class="day-header">Sunday</div>
-    
-    <?php
-    // Empty cells for days before the first day of the month
-    for ($day = 1; $day <= $days_in_month; $day++) {
-        $current_date = "$year-$month-" . str_pad($day, 2, '0', STR_PAD_LEFT);
-        $is_past = strtotime($current_date) < strtotime(date('Y-m-d'));
-        $is_reserved = isset($reservations[$current_date]);
-        $is_weekend = date('N', strtotime($current_date)) >= 6;
-        $reserved_by_me = false;
-        
-        if ($is_reserved && isset($_SESSION['user_id'])) {
-            $reserved_by_me = ($reservations[$current_date]['user_id'] == $_SESSION['user_id']);
-        }
-        
-        $cell_class = 'day-cell';
-        if ($is_past) {
-            $cell_class .= ' past-day';
-        } elseif ($is_reserved) {
-            $cell_class .= ' reservation-booked';
-        } elseif ($is_weekend) {
-            $cell_class .= ' weekend-day';
-        } else {
-            $cell_class .= ' reservation-available';
-        }
-        
-        echo '<div class="' . $cell_class . '">';
-        echo '<div class="day-number">' . $day . '</div>';
-        
-        if (!$is_past && !$is_reserved && !$is_weekend && 
-            ($_SESSION['user_role'] === 'customer' || $_SESSION['user_role'] === 'admin')) {
-            echo '<form method="POST" action="class-schedule.php" class="reservation-form">';
-            echo '<input type="hidden" name="class_id" value="' . $class_id . '">';
-            echo '<input type="hidden" name="reserve_date" value="' . $current_date . '">';
-            echo '<button type="submit" class="reserve-btn">Reserve</button>';
-            echo '</form>';
-        }
-        
-        if ($is_reserved) {
-            echo '<div class="reservation-info">' . ($reserved_by_me ? 'Booked by you' : 'Booked') . '</div>';
-        }
-        
-        if ($is_weekend) {
-            echo '<div class="reservation-info">Closed</div>';
-        }
-        
-        echo '</div>';
-        
-        // Break to new row after Sunday
-        if (($day + $first_day - 1) % 7 == 0 && $day != $days_in_month) {
-            echo '</div><div class="calendar-grid">';
-        }
-    }
-    
-    // Empty cells after last day of month to complete the grid
-    $last_day = date('N', strtotime("$year-$month-$days_in_month"));
-    for ($i = $last_day; $i < 7; $i++) {
-        echo '<div class="day-cell empty-cell"></div>';
-    }
-    ?>
-</div>
+                <!-- Day headers -->
+                <div class="day-header">Monday</div>
+                <div class="day-header">Tuesday</div>
+                <div class="day-header">Wednesday</div>
+                <div class="day-header">Thursday</div>
+                <div class="day-header">Friday</div>
+                <div class="day-header">Saturday</div>
+                <div class="day-header">Sunday</div>
+                
+                <?php
+                // Empty cells for days before the first day of the month
+                for ($i = 1; $i < $first_day; $i++) {
+                    echo '<div class="day-cell empty-cell"></div>';
+                }
+                
+                // Days of the month
+                for ($day = 1; $day <= $days_in_month; $day++) {
+                    $current_date = "$year-$month-" . str_pad($day, 2, '0', STR_PAD_LEFT);
+                    $is_past = strtotime($current_date) < strtotime(date('Y-m-d'));
+                    $is_reserved = isset($reservations[$current_date]);
+                    $is_weekend = date('N', strtotime($current_date)) >= 6;
+                    $reserved_by_me = false;
+                    $status = '';
+                    
+                    if ($is_reserved) {
+                        $status = $reservations[$current_date]['status'];
+                        if (isset($_SESSION['user_id'])) {
+                            $reserved_by_me = ($reservations[$current_date]['user_id'] == $_SESSION['user_id']);
+                        }
+                    }
+                    
+                    $cell_class = 'day-cell';
+                    if ($is_past) {
+                        $cell_class .= ' past-day';
+                    } elseif ($is_reserved) {
+                        if ($status === 'approved') {
+                            $cell_class .= ' reservation-booked';
+                        } elseif ($status === 'pending') {
+                            if ($reserved_by_me) {
+                                $cell_class .= ' pending-approval';
+                            } else {
+                                $cell_class .= ' requested-by-other';
+                            }
+                        }
+                    } elseif ($is_weekend) {
+                        $cell_class .= ' weekend-day';
+                    } else {
+                        $cell_class .= ' reservation-available';
+                    }
+                    
+                    echo '<div class="' . $cell_class . '">';
+                    echo '<div class="day-number">' . $day . '</div>';
+                    
+                    // Reservation status display
+                    if ($is_reserved) {
+                        if ($status === 'approved') {
+                            echo '<div class="reservation-info">Booked</div>';
+                        } elseif ($status === 'pending') {
+                            if ($reserved_by_me) {
+                                echo '<div class="reservation-info">Pending approval</div>';
+                            } else {
+                                echo '<div class="reservation-info">Requested by someone else</div>';
+                            }
+                            
+                            // Show approve button for admin/verification
+                            if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification') {
+                                echo '<form method="POST" action="approve-reservation.php" class="approval-form">';
+                                echo '<input type="hidden" name="reservation_id" value="' . $reservations[$current_date]['reservation_id'] . '">';
+                                echo '<input type="hidden" name="class_id" value="' . $class_id . '">';
+                                echo '<button type="submit" name="action" value="approve" class="approve-btn">Approve</button>';
+                                echo '</form>';
+                            }
+                        }
+                    } elseif ($is_weekend) {
+                        echo '<div class="reservation-info">Closed</div>';
+                    }
+                    
+                    // Show reserve button only if date is available
+                    if (!$is_past && !$is_reserved && !$is_weekend && 
+                        ($_SESSION['user_role'] === 'customer' || $_SESSION['user_role'] === 'admin')) {
+                        echo '<form method="POST" action="class-schedule.php" class="reservation-form">';
+                        echo '<input type="hidden" name="class_id" value="' . $class_id . '">';
+                        echo '<input type="hidden" name="reserve_date" value="' . $current_date . '">';
+                        echo '<button type="submit" class="reserve-btn">Request Reservation</button>';
+                        echo '</form>';
+                    }
+                    
+                    echo '</div>';
+                    
+                    // Break to new row after Sunday
+                    if (($day + $first_day - 1) % 7 == 0 && $day != $days_in_month) {
+                        echo '</div><div class="calendar-grid">';
+                    }
+                }
+                
+                // Empty cells after last day of month to complete the grid
+                $last_day = date('N', strtotime("$year-$month-$days_in_month"));
+                for ($i = $last_day; $i < 7; $i++) {
+                    echo '<div class="day-cell empty-cell"></div>';
+                }
+                ?>
+            </div>
         </section>
-
-        
     </main>
 
     <?php require "assets/footer.php"; ?>
     
+    <script>
+        // Add click handler for available days
+        document.querySelectorAll('.reservation-available').forEach(cell => {
+            cell.addEventListener('click', function() {
+                const form = this.querySelector('form');
+                if (form) {
+                    if (confirm('Are you sure you want to request this class on ' + this.querySelector('.day-number').textContent + '?')) {
+                        form.submit();
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

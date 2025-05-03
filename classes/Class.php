@@ -115,44 +115,88 @@ class ClassItem {
         $stmt->execute(['user_id' => $user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public static function createReservation($connection, $class_id, $user_id, $date) {
-        try {
-            $sql = "INSERT INTO class_reservations (class_id, user_id, date) 
-                    VALUES (:class_id, :user_id, :date)";
-            $stmt = $connection->prepare($sql);
-            
-            $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
-            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-            $stmt->bindParam(':date', $date, PDO::PARAM_STR);
-            
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            error_log("Reservation Error: " . $e->getMessage());
-            return false;
-        }
-    }
-
+    
     public static function getClassReservations($connection, $class_id, $month, $year) {
-        $start_date = "$year-$month-01";
-        $end_date = date("Y-m-t", strtotime($start_date));
-        
-        $sql = "SELECT DATE(date) as date, user_id 
+        $sql = "SELECT reservation_id, class_id, user_id, DATE(date) as reservation_date 
                 FROM class_reservations 
                 WHERE class_id = :class_id 
-                AND date BETWEEN :start_date AND :end_date";
-        
+                AND MONTH(date) = :month 
+                AND YEAR(date) = :year";
         $stmt = $connection->prepare($sql);
-        $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
-        $stmt->bindParam(':start_date', $start_date, PDO::PARAM_STR);
-        $stmt->bindParam(':end_date', $end_date, PDO::PARAM_STR);
-        $stmt->execute();
+        $stmt->execute([
+            'class_id' => $class_id,
+            'month' => $month,
+            'year' => $year
+        ]);
         
         $reservations = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $reservations[$row['date']] = $row;
+        while ($row = $stmt->fetch()) {
+            $reservations[$row['reservation_date']] = $row;
         }
         
         return $reservations;
     }
+
+    public static function createReservation($connection, $class_id, $user_id, $date, $status = 'pending') {
+        $sql = "INSERT INTO class_reservations (class_id, user_id, date, status) 
+                VALUES (:class_id, :user_id, :date, :status)";
+        $stmt = $connection->prepare($sql);
+        return $stmt->execute([
+            'class_id' => $class_id,
+            'user_id' => $user_id,
+            'date' => $date,
+            'status' => $status
+        ]);
+    }
+    
+    public static function getReservationStatus($connection, $class_id, $date) {
+        $sql = "SELECT status FROM class_reservations 
+                WHERE class_id = :class_id AND date = :date
+                ORDER BY status = 'approved' DESC LIMIT 1";
+        $stmt = $connection->prepare($sql);
+        $stmt->execute(['class_id' => $class_id, 'date' => $date]);
+        $result = $stmt->fetch();
+        return $result ? $result['status'] : null;
+    }
+
+    public static function getPendingReservations($connection) {
+        $sql = "SELECT r.*, c.name as class_name, u.name as user_name 
+                FROM class_reservations r
+                JOIN classes c ON r.class_id = c.class_id
+                JOIN users u ON r.user_id = u.id
+                WHERE r.status = 'pending'";
+        $stmt = $connection->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public static function getReservationById($connection, $reservation_id) {
+        $sql = "SELECT * FROM class_reservations WHERE reservation_id = :id";
+        $stmt = $connection->prepare($sql);
+        $stmt->execute(['id' => $reservation_id]);
+        return $stmt->fetch();
+    }
+    
+    public static function updateReservationStatus($connection, $reservation_id, $status) {
+        $sql = "UPDATE class_reservations SET status = :status WHERE reservation_id = :id";
+        $stmt = $connection->prepare($sql);
+        return $stmt->execute([
+            'status' => $status,
+            'id' => $reservation_id
+        ]);
+    }
+    
+    public static function rejectOtherPendingReservations($connection, $class_id, $date) {
+        $sql = "UPDATE class_reservations SET status = 'rejected' 
+                WHERE class_id = :class_id 
+                AND date = :date 
+                AND status = 'pending'";
+        $stmt = $connection->prepare($sql);
+        return $stmt->execute([
+            'class_id' => $class_id,
+            'date' => $date
+        ]);
+    }
+
 }
 ?>
