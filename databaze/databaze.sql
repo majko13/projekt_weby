@@ -57,6 +57,11 @@ CREATE TABLE `class_reservations` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Add status column to class_reservations table
+ALTER TABLE `class_reservations` 
+ADD COLUMN `status` ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending' 
+AFTER `date`;
+
 -- --------------------------------------------------------
 
 --

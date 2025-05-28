@@ -25,6 +25,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["update_role"])) {
     }
 }
 
+// Add a link to the verification page for admin and verification users
+if ($_SESSION["user_role"] === 'admin' || $_SESSION["user_role"] === 'verification') {
+    $verification_link = '<div class="admin-actions">
+        <a href="admin/approve-reservations.php" class="btn">Verify Pending Reservations</a>
+    </div>';
+}
+
 // Get all users
 $users = User::getAllUsers($connection);
 $database->closeConnection();
@@ -52,6 +59,8 @@ $database->closeConnection();
             <?php if (isset($error)): ?>
                 <div class="alert error"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
+
+            <?php if (isset($verification_link)) echo $verification_link; ?>
 
             <table>
                 <thead>
