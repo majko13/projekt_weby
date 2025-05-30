@@ -103,6 +103,8 @@ try {
 
 $database->closeConnection();
 
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -156,68 +158,86 @@ $database->closeConnection();
             z-index: 10;
         }
         .reservation-booked .day-number {
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            font-size: 1.3em;
+            color: white !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
+            font-size: 1.4em !important;
+            font-weight: bold !important;
         }
         .pending-approval .day-number,
         .requested-by-other .day-number {
-            color: #333;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            color: #333 !important;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8) !important;
+            font-weight: bold !important;
+        }
+        .weekend-day .day-number {
+            color: white !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
+            font-weight: bold !important;
         }
         .empty-cell {
             background: #f9f9f9;
         }
+        /* GREEN - Available (No record in class_reservations table) */
         .reservation-available {
-            background: linear-gradient(135deg, #e6f7e6, #d4edda);
-            border: 2px solid #28a745;
-            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
-            animation: subtle-pulse 3s ease-in-out infinite;
-        }
-        @keyframes subtle-pulse {
-            0%, 100% {
-                box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
-                transform: scale(1);
-            }
-            50% {
-                box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
-                transform: scale(1.02);
-            }
-        }
-        .reservation-booked {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-            cursor: not-allowed;
-            border: 3px solid #bd2130;
-            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+            background: linear-gradient(135deg, #d1f2d1, #a8e6a8);
+            border: 3px solid #28a745;
+            box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
+            animation: available-glow 4s ease-in-out infinite;
             position: relative;
             overflow: hidden;
-            pointer-events: none; /* Make completely unclickable */
         }
-        .reservation-booked::before {
-            content: "🔒";
+        .reservation-available::before {
+            content: "✅";
             position: absolute;
             top: 5px;
             right: 5px;
-            font-size: 16px;
-            opacity: 0.8;
+            font-size: 14px;
+            opacity: 0.7;
         }
-        .reservation-booked::after {
+        .reservation-available::after {
             content: "";
             position: absolute;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(255,255,255,0.1) 10px,
-                rgba(255,255,255,0.1) 20px
-            );
-            animation: diagonal-stripes 20s linear infinite;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            animation: shimmer 6s ease-in-out infinite;
         }
+        @keyframes available-glow {
+            0%, 100% {
+                box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
+                border-color: #28a745;
+            }
+            50% {
+                box-shadow: 0 6px 12px rgba(40, 167, 69, 0.5);
+                border-color: #20c997;
+            }
+        }
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        /* RED - Approved/Booked (status = 'approved' in class_reservations) */
+        .reservation-booked {
+            background: #dc3545 !important;
+            color: white !important;
+            cursor: not-allowed !important;
+            border: 3px solid #b02a37 !important;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.5) !important;
+            position: relative;
+            pointer-events: none !important;
+        }
+        .reservation-booked::before {
+            content: "🔒";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+
         @keyframes diagonal-stripes {
             0% { transform: translateX(-50px) translateY(-50px); }
             100% { transform: translateX(50px) translateY(50px); }
@@ -228,11 +248,23 @@ $database->closeConnection();
             cursor: not-allowed;
             opacity: 0.6;
         }
+        /* RED - Weekend/Closed (Weekend days - not available) */
         .weekend-day {
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-            cursor: not-allowed;
-            border: 2px solid #dc3545;
-            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+            background: #dc3545 !important;
+            color: white !important;
+            cursor: not-allowed !important;
+            border: 3px solid #b02a37 !important;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.5) !important;
+            position: relative;
+            pointer-events: none !important;
+        }
+        .weekend-day::before {
+            content: "🚫";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 16px;
+            opacity: 0.8;
         }
         .reservation-form {
             margin-top: 5px;
@@ -247,24 +279,28 @@ $database->closeConnection();
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         .reservation-booked .reservation-info {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.2) !important;
+            color: white !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            font-weight: bold !important;
         }
         .pending-approval .reservation-info {
-            background: rgba(255,255,255,0.8);
-            color: #856404;
-            border: 1px solid #ffc107;
+            background: rgba(255,255,255,0.9) !important;
+            color: #333 !important;
+            border: 2px solid #e6ac00 !important;
+            font-weight: bold !important;
         }
         .requested-by-other .reservation-info {
-            background: rgba(255,255,255,0.8);
-            color: #856404;
-            border: 1px solid #ffc107;
+            background: rgba(255,255,255,0.9) !important;
+            color: #333 !important;
+            border: 2px solid #e6ac00 !important;
+            font-weight: bold !important;
         }
         .weekend-day .reservation-info {
-            background: rgba(255,255,255,0.8);
-            color: #721c24;
-            border: 1px solid #dc3545;
+            background: rgba(255,255,255,0.2) !important;
+            color: white !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            font-weight: bold !important;
         }
         .month-nav {
             display: flex;
@@ -283,10 +319,12 @@ $database->closeConnection();
             transform: none !important;
             box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3) !important;
         }
+        /* YELLOW - Pending (status = 'pending' in class_reservations, your user_id) */
         .pending-approval {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            border: 2px solid #ffc107;
-            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+            background: #ffc107 !important;
+            color: #333 !important;
+            border: 3px solid #e6ac00 !important;
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.5) !important;
             position: relative;
         }
         .pending-approval::before {
@@ -297,10 +335,13 @@ $database->closeConnection();
             font-size: 16px;
             opacity: 0.8;
         }
+
+        /* YELLOW - Other's Request (status = 'pending' in class_reservations, different user_id) */
         .requested-by-other {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            border: 2px solid #ffc107;
-            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+            background: #ffc107 !important;
+            color: #333 !important;
+            border: 3px solid #e6ac00 !important;
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.5) !important;
             position: relative;
         }
         .requested-by-other::before {
@@ -311,6 +352,7 @@ $database->closeConnection();
             font-size: 16px;
             opacity: 0.8;
         }
+
         .approval-form {
             margin-top: 5px;
         }
@@ -468,30 +510,38 @@ $database->closeConnection();
 
             <!-- Calendar Legend -->
             <div class="calendar-legend">
-                <h3 style="text-align: center; margin-bottom: 15px; color: #333;">Calendar Status Guide</h3>
+                <h3 style="text-align: center; margin-bottom: 15px; color: #333;">📅 Calendar Status Guide - Database Driven</h3>
+                <p style="text-align: center; margin-bottom: 20px; color: #666; font-size: 0.9em;">
+                    Colors change based on <code>class_reservations.status</code> field in database
+                </p>
                 <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                     <div class="legend-item">
                         <div class="legend-color legend-available"></div>
-                        <span><strong>🟢 Available</strong><br><small>No reservation</small></span>
+                        <span><strong>🟢 Available</strong><br><small>No record in DB</small></span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color legend-booked"></div>
-                        <span><strong>🔴 Booked</strong><br><small>Status: approved</small></span>
+                        <span><strong>🔴 Booked</strong><br><small>status = 'approved'</small></span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color legend-pending"></div>
-                        <span><strong>🟡 Your Pending</strong><br><small>Status: pending</small></span>
+                        <span><strong>🟡 Your Pending</strong><br><small>status = 'pending' (yours)</small></span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color legend-other"></div>
-                        <span><strong>🟡 Other's Request</strong><br><small>Status: pending</small></span>
+                        <span><strong>🟡 Other's Request</strong><br><small>status = 'pending' (other user)</small></span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color legend-weekend"></div>
-                        <span><strong>🔴 Weekend/Closed</strong><br><small>Not available</small></span>
+                        <span><strong>🔴 Weekend/Closed</strong><br><small>Weekend days</small></span>
                     </div>
                 </div>
+                <div style="text-align: center; margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 0.85em;">
+                    <strong>Note:</strong> Rejected reservations (status = 'rejected') are automatically deleted from database
+                </div>
             </div>
+
+
 
             <div class="calendar-grid">
                 <!-- Day headers -->
@@ -511,59 +561,49 @@ $database->closeConnection();
 
                 // Days of the month
                 for ($day = 1; $day <= $days_in_month; $day++) {
-                    $current_date = "$year-$month-" . str_pad($day, 2, '0', STR_PAD_LEFT);
+                    $current_date = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT) . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
                     $is_past = strtotime($current_date) < strtotime(date('Y-m-d'));
                     $is_reserved = isset($reservations[$current_date]);
                     $is_weekend = date('N', strtotime($current_date)) >= 6;
                     $reserved_by_me = false;
                     $status = '';
 
-                    if ($is_reserved) {
+                    // Get status from reservations array
+                    if (isset($reservations[$current_date])) {
                         $status = $reservations[$current_date]['status'];
+                        $is_reserved = true;
                         if (isset($_SESSION['logged_in_user_id'])) {
                             $reserved_by_me = ($reservations[$current_date]['user_id'] == $_SESSION['logged_in_user_id']);
                         }
                     }
 
+                    // Cell class assignment - STATUS FIRST approach
                     $cell_class = 'day-cell';
+
                     if ($is_past) {
                         $cell_class .= ' past-day';
-                    } elseif ($is_reserved) {
-                        // Check database status and apply appropriate class
-                        if ($status === 'approved') {
-                            $cell_class .= ' reservation-booked'; // RED - Booked
-                        } elseif ($status === 'pending') {
-                            if ($reserved_by_me) {
-                                $cell_class .= ' pending-approval'; // YELLOW - Your Pending
-                            } else {
-                                $cell_class .= ' requested-by-other'; // YELLOW - Other's Request
-                            }
-                        }
-                        // Note: 'rejected' status reservations are deleted from DB, so won't appear here
+                    } elseif ($status === 'approved') {
+                        $cell_class .= ' reservation-booked'; // RED - Approved reservation
+                    } elseif ($status === 'pending') {
+                        $cell_class .= $reserved_by_me ? ' pending-approval' : ' requested-by-other'; // YELLOW - Pending reservation
                     } elseif ($is_weekend) {
                         $cell_class .= ' weekend-day'; // RED - Weekend/Closed
                     } else {
-                        $cell_class .= ' reservation-available'; // GREEN - Available
+                        $cell_class .= ' reservation-available'; // GREEN - Available (no status)
                     }
 
                     echo '<div class="' . $cell_class . '">';
                     echo '<div class="day-number">' . $day . '</div>';
 
-                    // Reservation status display
-                    if ($is_reserved) {
-                        // Display status based on database value
-                        if ($status === 'approved') {
-                            echo '<div class="reservation-info">Booked</div>';
-                        } elseif ($status === 'pending') {
-                            if ($reserved_by_me) {
-                                echo '<div class="reservation-info">Pending approval</div>';
-                            } else {
-                                echo '<div class="reservation-info">Requested by someone else</div>';
-                            }
-                        }
 
-                        // Show approve button for admin/verification (only for pending status)
-                        if ($status === 'pending' && ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification')) {
+
+                    // Display status info
+                    if ($status === 'approved') {
+                        echo '<div class="reservation-info">🔒 Booked</div>';
+                    } elseif ($status === 'pending') {
+                        echo '<div class="reservation-info">' . ($reserved_by_me ? '⏳ Pending approval' : '👤 Requested by someone else') . '</div>';
+                        // Admin approve button
+                        if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification') {
                             echo '<form method="POST" action="approve-reservation.php" class="approval-form">';
                             echo '<input type="hidden" name="reservation_id" value="' . $reservations[$current_date]['reservation_id'] . '">';
                             echo '<input type="hidden" name="class_id" value="' . $class_id . '">';
@@ -574,9 +614,8 @@ $database->closeConnection();
                         echo '<div class="reservation-info">Closed</div>';
                     }
 
-                    // Show reserve button only if date is available
-                    if (!$is_past && !$is_reserved && !$is_weekend &&
-                        ($_SESSION['user_role'] === 'customer' || $_SESSION['user_role'] === 'admin')) {
+                    // Reserve button - only show if no status (available) and not past/weekend
+                    if (!$is_past && $status === '' && !$is_weekend && ($_SESSION['user_role'] === 'customer' || $_SESSION['user_role'] === 'admin')) {
                         echo '<form method="POST" action="class-schedule.php" class="reservation-form">';
                         echo '<input type="hidden" name="class_id" value="' . $class_id . '">';
                         echo '<input type="hidden" name="reserve_date" value="' . $current_date . '">';
@@ -584,7 +623,7 @@ $database->closeConnection();
                         echo '</form>';
                     }
 
-                    // Show "View Day" button for admin and verification roles
+                    // Admin "View Day" button
                     if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification') {
                         echo '<a href="day-reservations.php?class_id=' . $class_id . '&date=' . $current_date . '" class="view-day-btn">View Day</a>';
                     }
