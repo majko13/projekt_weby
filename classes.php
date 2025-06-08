@@ -29,23 +29,7 @@ $database->closeConnection();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class List</title>
-    <link rel="stylesheet" href="assets/style.css">
-    <style>
-        .class-list { max-width: 800px; margin: 0 auto; }
-        .class-card { 
-            border: 1px solid #ddd; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-        .class-card:hover {
-            background-color: #f5f5f5;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .class-card h3 { margin-top: 0; }
-    </style>
+    <link rel="stylesheet" href="assets/styles.css?v=<?= time() ?>">
 </head>
 <body>
     <?php require "assets/header.php"; ?>

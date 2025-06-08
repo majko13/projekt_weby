@@ -56,7 +56,7 @@ $database->closeConnection();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Class</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/styles.css?v=<?= time() ?>">
 </head>
 <body>
     <?php require "assets/header.php"; ?>

@@ -77,7 +77,7 @@ $database->closeConnection();
 <html>
 <head>
     <title>Approve Reservations</title>
-    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="stylesheet" href="../assets/styles.css?v=<?= time() ?>">
 </head>
 <body>
     <?php require "../assets/header.php"; ?>
