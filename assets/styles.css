@@ -625,6 +625,27 @@ td {
     position: relative;
 }
 
+/* BLUE - My Approved Reservation Cells */
+.my-approved-reservation {
+    background: #007bff !important;
+    color: white !important;
+    border: 3px solid #0056b3 !important;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.5) !important;
+    position: relative;
+    animation: approved-glow 3s ease-in-out infinite;
+}
+
+@keyframes approved-glow {
+    0%, 100% {
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.5);
+        border-color: #0056b3;
+    }
+    50% {
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.7);
+        border-color: #007bff;
+    }
+}
+
 .reservation-booked::before {
     content: "🔒";
     position: absolute;
@@ -634,10 +655,37 @@ td {
     opacity: 0.9;
 }
 
+.my-approved-reservation::before {
+    content: "🎉";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 18px;
+    opacity: 0.9;
+    animation: pulse-approved 2s ease-in-out infinite;
+}
+
+@keyframes pulse-approved {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
 .reservation-booked:hover {
     background: #dc3545 !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4) !important;
+}
+
+.my-approved-reservation:hover {
+    background: #007bff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.6) !important;
 }
 
 /* YELLOW - Pending Cells */
@@ -681,6 +729,12 @@ td {
 }
 
 .pending-approval .day-number {
+    color: white !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
+    font-weight: bold !important;
+}
+
+.my-approved-reservation .day-number {
     color: white !important;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
     font-weight: bold !important;
@@ -738,6 +792,20 @@ td {
     background: rgba(255,255,255,0.9) !important;
     color: #333 !important;
     border: 2px solid #dc3545 !important;
+    font-weight: bold !important;
+}
+
+.reservation-available .reservation-info {
+    background: rgba(255,255,255,0.9) !important;
+    color: #333 !important;
+    border: 2px solid #28a745 !important;
+    font-weight: bold !important;
+}
+
+.my-approved-reservation .reservation-info {
+    background: rgba(255,255,255,0.9) !important;
+    color: #333 !important;
+    border: 2px solid #007bff !important;
     font-weight: bold !important;
 }
 
@@ -895,6 +963,20 @@ td {
 
 .legend-booked::after {
     content: "🔒";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+}
+
+.legend-approved {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: 2px solid #007bff;
+}
+
+.legend-approved::after {
+    content: "🎉";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1495,5 +1577,684 @@ td {
 
 .cta-buttons .btn {
     min-width: 150px;
+}
+
+/* ===== ADMIN PANEL STYLES ===== */
+
+.admin-actions {
+    text-align: center;
+    margin: 30px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
+}
+
+.admin-actions .btn {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    border-color: #28a745;
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    padding: 12px 25px;
+    font-size: 1.1em;
+    min-width: 200px;
+}
+
+.admin-actions .btn:hover {
+    background: linear-gradient(135deg, #1e7e34, #155724);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Role Management Styling */
+.role-management-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.role-management-form select {
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+    min-width: 120px;
+}
+
+.role-management-form select:focus {
+    outline: none;
+    border-color: #0056b3;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.role-management-form select:hover {
+    border-color: #0056b3;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+}
+
+.role-management-form button {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    min-width: 80px;
+}
+
+.role-management-form button:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    border-color: #0056b3;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.role-management-form button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Role Text Styling - Very Simple */
+.role-admin {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.role-verification {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.role-customer {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.role-readonly {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablet Styles (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+    main {
+        margin: 15px;
+        padding: 20px;
+        max-width: none;
+    }
+
+    .header-container {
+        padding: 0 20px;
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .header-nav {
+        justify-content: center;
+    }
+
+    .nav-list {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .calendar-grid {
+        gap: 8px;
+    }
+
+    .day-cell {
+        min-height: 100px;
+        padding: 10px 8px;
+        font-size: 0.9em;
+    }
+
+    /* Schedule Typography Tablet */
+    .schedule-header h1 {
+        font-size: 1.8em;
+    }
+
+    .schedule-header .description {
+        font-size: 1.05em;
+    }
+
+    .calendar-header h2 {
+        font-size: 1.5em;
+    }
+
+    .day-header {
+        font-size: 0.95em;
+        padding: 9px;
+    }
+
+    .day-number {
+        font-size: 1.05em;
+    }
+
+    .reservation-info {
+        font-size: 0.85em;
+        padding: 4px 6px;
+    }
+
+    .reserve-btn {
+        font-size: 0.8em;
+        padding: 5px 8px;
+    }
+
+    .view-day-btn {
+        font-size: 0.8em;
+        padding: 6px 8px;
+    }
+
+    .class-grid, .classes-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .feature-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 25px;
+        align-items: center;
+    }
+
+    .footer-info {
+        justify-content: center;
+        gap: 30px;
+    }
+
+    .footer-brand {
+        text-align: center;
+    }
+
+    .footer-section {
+        text-align: center;
+    }
+}
+
+/* Mobile Styles (up to 768px) */
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    main {
+        margin: 10px;
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    h1 {
+        font-size: 2.2em;
+        margin-bottom: 15px;
+    }
+
+    h2 {
+        font-size: 1.8em;
+    }
+
+    h3 {
+        font-size: 1.5em;
+    }
+
+    /* Header Mobile */
+    .header-container {
+        padding: 0 15px;
+    }
+
+    .header-brand h1 {
+        font-size: 3em;
+        font-weight: bold;
+    }
+
+    .header-brand .header-subtitle {
+        font-size: 1.6em;
+        font-weight: 500;
+    }
+
+    .nav-list {
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .nav-link {
+        padding: 18px 22px;
+        font-size: 1.8em;
+        font-weight: 600;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .nav-icon {
+        font-size: 2em;
+        margin-right: 14px;
+    }
+
+    .user-info {
+        flex-direction: column;
+        gap: 14px;
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 18px;
+        font-size: 1.3em;
+    }
+
+    .user-name {
+        font-size: 1.4em;
+        font-weight: 600;
+    }
+
+    .user-role {
+        font-size: 1.3em;
+        font-weight: 500;
+    }
+
+    /* Calendar Mobile */
+    .calendar {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -10px;
+        padding: 0 10px;
+    }
+
+    .calendar-grid {
+        min-width: 650px;
+        gap: 8px;
+    }
+
+    .day-cell {
+        min-height: 100px;
+        padding: 12px 8px;
+        font-size: 1em;
+    }
+
+    .day-number {
+        font-size: 1.4em;
+        margin-bottom: 6px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .reservation-info {
+        font-size: 1em;
+        padding: 5px 8px;
+        margin-top: 6px;
+        text-align: center;
+    }
+
+    .reserve-btn {
+        padding: 8px 12px;
+        font-size: 0.95em;
+        font-weight: bold;
+        width: 100%;
+        margin-top: 6px;
+        min-height: 36px;
+    }
+
+    .view-day-btn {
+        padding: 8px 12px;
+        font-size: 0.95em;
+        height: 36px;
+        line-height: 1;
+        font-weight: bold;
+        width: 100%;
+        margin-top: 6px;
+    }
+
+    /* Schedule Header Mobile */
+    .schedule-header h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .schedule-header .description {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+
+    .calendar-header h2 {
+        font-size: 1.6em;
+    }
+
+    /* Day Headers Mobile */
+    .day-header {
+        font-size: 1.1em;
+        padding: 8px;
+        font-weight: bold;
+    }
+
+    /* Calendar Legend Mobile */
+    .legend-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .legend-item {
+        flex-direction: row;
+        gap: 10px;
+        min-width: auto;
+    }
+
+    .legend-color {
+        width: 25px;
+        height: 25px;
+    }
+
+    /* Forms Mobile */
+    .form, .registration-form {
+        padding: 25px;
+        margin: 0 8px;
+        border-radius: 15px;
+    }
+
+    .form input,
+    .form textarea,
+    .form select,
+    .registration-form input,
+    .reg-input {
+        padding: 16px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        border-radius: 10px;
+        margin-bottom: 16px;
+        min-height: 50px;
+        box-sizing: border-box;
+    }
+
+    .form .btn,
+    .registration-form .btn {
+        padding: 16px;
+        font-size: 1.3em;
+        min-height: 50px;
+        border-radius: 10px;
+    }
+
+    /* Tables Mobile */
+    table {
+        font-size: 0.85em;
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+
+    thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 8px;
+        background: white;
+        display: block;
+        white-space: normal;
+    }
+
+    td {
+        border: none;
+        position: relative;
+        padding: 8px 8px 8px 50%;
+        text-align: left;
+        white-space: normal;
+    }
+
+    td:before {
+        content: attr(data-label) ": ";
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: bold;
+        color: #333;
+    }
+
+    /* Role Management Mobile */
+    .role-management-form {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .role-management-form select,
+    .role-management-form button {
+        width: 100%;
+        min-width: auto;
+    }
+
+    /* Cards Mobile */
+    .class-grid, .classes-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .class-card {
+        padding: 20px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Buttons Mobile */
+    .btn {
+        padding: 16px 20px;
+        font-size: 1.2em;
+        min-height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .class-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .class-actions .btn {
+        width: 100%;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 10px;
+    }
+
+    .cta-buttons .btn {
+        width: 100%;
+        min-width: auto;
+    }
+
+    /* Month Navigation Mobile */
+    .month-nav {
+        flex-direction: column;
+        gap: 12px;
+        margin: 20px 0;
+    }
+
+    .month-nav .btn {
+        width: 100%;
+        padding: 14px;
+    }
+
+    /* Modal Mobile */
+    .modal-content {
+        margin: 20px;
+        padding: 20px;
+        max-width: none;
+        width: auto;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-btn {
+        width: 100%;
+    }
+
+    /* Footer Mobile */
+    .footer-container {
+        padding: 0 15px;
+    }
+
+    .footer-content {
+        text-align: center;
+    }
+
+    .footer-info {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .footer-section {
+        text-align: center;
+    }
+
+    /* Admin Panel Mobile */
+    .admin-actions {
+        padding: 15px;
+        margin: 20px 0;
+    }
+
+    .admin-actions .btn {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+/* Small Mobile Styles (up to 480px) */
+@media screen and (max-width: 480px) {
+    main {
+        margin: 5px;
+        padding: 10px;
+    }
+
+    .header-container {
+        padding: 0 10px;
+    }
+
+    .header-brand h1 {
+        font-size: 1.3em;
+    }
+
+    .nav-link {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+
+    .calendar-grid {
+        min-width: 500px;
+        gap: 3px;
+    }
+
+    .day-cell {
+        min-height: 75px;
+        padding: 6px 4px;
+        font-size: 0.8em;
+    }
+
+    .day-number {
+        font-size: 0.9em;
+        font-weight: bold;
+    }
+
+    .reservation-info {
+        font-size: 0.75em;
+        padding: 2px 4px;
+    }
+
+    .reserve-btn {
+        padding: 3px 6px;
+        font-size: 0.7em;
+        font-weight: bold;
+    }
+
+    .view-day-btn {
+        padding: 4px 6px;
+        font-size: 0.7em;
+        height: 24px;
+        line-height: 12px;
+        font-weight: bold;
+    }
+
+    /* Schedule Header Small Mobile */
+    .schedule-header h1 {
+        font-size: 1.4em;
+    }
+
+    .schedule-header .description {
+        font-size: 0.95em;
+    }
+
+    .calendar-header h2 {
+        font-size: 1.2em;
+    }
+
+    .day-header {
+        font-size: 0.85em;
+        padding: 6px;
+    }
+
+    .form, .registration-form {
+        padding: 15px;
+    }
+
+    .modal-content {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .footer-container {
+        padding: 0 10px;
+    }
 }
 

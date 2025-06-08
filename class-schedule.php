@@ -207,13 +207,19 @@ $database->closeConnection();
                     if ($is_past) {
                         $cell_class .= ' past-day';
                     } elseif ($status === 'approved') {
-                        $cell_class .= ' reservation-booked'; // RED - Approved reservation
+                        if ($_SESSION['user_role'] === 'customer' && $reserved_by_me) {
+                            $cell_class .= ' my-approved-reservation'; // BLUE - My approved reservation
+                        } else {
+                            $cell_class .= ' reservation-booked'; // RED - Others' approved reservation (appears as booked)
+                        }
                     } elseif ($status === 'pending') {
-                        // Only show pending status to admin and verification users
+                        // Show pending status to admin, verification users, and the customer who made the reservation
                         if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification') {
                             $cell_class .= ' pending-approval'; // YELLOW - Pending reservation (admin view)
+                        } elseif ($_SESSION['user_role'] === 'customer' && $reserved_by_me) {
+                            $cell_class .= ' pending-approval'; // YELLOW - My pending reservation (customer view)
                         } else {
-                            $cell_class .= ' reservation-available'; // GREEN - Available (customer view)
+                            $cell_class .= ' reservation-available'; // GREEN - Available (other customers view)
                         }
                     } elseif ($is_weekend) {
                         $cell_class .= ' weekend-day'; // RED - Weekend/Closed
@@ -228,17 +234,25 @@ $database->closeConnection();
 
                     // Display status info
                     if ($status === 'approved') {
-                        echo '<div class="reservation-info">Booked</div>';
+                        if ($_SESSION['user_role'] === 'customer' && $reserved_by_me) {
+                            echo '<div class="reservation-info">Approved</div>';
+                        } else {
+                            echo '<div class="reservation-info">Booked</div>';
+                        }
                     } elseif ($status === 'pending' && ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification')) {
+                        echo '<div class="reservation-info">Pending</div>';
+                    } elseif ($status === 'pending' && $_SESSION['user_role'] === 'customer' && $reserved_by_me) {
                         echo '<div class="reservation-info">Pending</div>';
                     } elseif ($is_weekend) {
                         echo '<div class="reservation-info">Closed</div>';
+                    } elseif ($_SESSION['user_role'] === 'readonly' && !$is_past && !$is_weekend && ($status === '' || ($status === 'pending' && !$reserved_by_me))) {
+                        echo '<div class="reservation-info">Available</div>';
                     }
 
-                    // Reserve button - show for available days and pending days (for customers who see them as available)
+                    // Reserve button - show for available days only
                     if (!$is_past && !$is_weekend && ($_SESSION['user_role'] === 'customer' || $_SESSION['user_role'] === 'admin')) {
-                        // Show button if no status OR if pending status but user is not admin/verification (they see it as available)
-                        if ($status === '' || ($status === 'pending' && $_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'verification')) {
+                        // Show button if no status OR if pending status but it's my own reservation (so I can see it's pending)
+                        if ($status === '' || ($status === 'pending' && $_SESSION['user_role'] === 'customer' && !$reserved_by_me)) {
                             echo '<form method="POST" action="class-schedule.php" class="reservation-form">';
                             echo '<input type="hidden" name="class_id" value="' . $class_id . '">';
                             echo '<input type="hidden" name="reserve_date" value="' . $current_date . '">';
@@ -282,6 +296,12 @@ $database->closeConnection();
                         <div class="legend-color legend-booked"></div>
                         <span><strong>🔴 Booked</strong></span>
                     </div>
+                    <?php if ($_SESSION['user_role'] === 'customer'): ?>
+                    <div class="legend-item">
+                        <div class="legend-color legend-approved"></div>
+                        <span><strong>🔵 My Approved</strong></span>
+                    </div>
+                    <?php endif; ?>
                     <div class="legend-item">
                         <div class="legend-color legend-pending"></div>
                         <span><strong>🟡 Pending</strong></span>

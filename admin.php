@@ -75,18 +75,22 @@ $database->closeConnection();
                 <tbody>
                     <?php foreach ($users as $user): ?>
                     <tr>
-                        <td><?= htmlspecialchars($user['id']) ?></td>
-                        <td><?= htmlspecialchars($user['name']) ?></td>
-                        <td><?= htmlspecialchars($user['email']) ?></td>
-                        <td><?= htmlspecialchars($user['role']) ?></td>
-                        <td>
-                            <form method="POST">
+                        <td data-label="ID"><?= htmlspecialchars($user['id']) ?></td>
+                        <td data-label="Name"><?= htmlspecialchars($user['name']) ?></td>
+                        <td data-label="Email"><?= htmlspecialchars($user['email']) ?></td>
+                        <td data-label="Current Role">
+                            <span class="role-<?= $user['role'] ?>">
+                                <?= ucfirst(htmlspecialchars($user['role'])) ?>
+                            </span>
+                        </td>
+                        <td data-label="Change Role">
+                            <form method="POST" class="role-management-form">
                                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                                 <select name="new_role">
-                                    <option value="readonly" <?= $user['role'] === 'readonly' ? 'selected' : '' ?>>Readonly</option>
-                                    <option value="customer" <?= $user['role'] === 'customer' ? 'selected' : '' ?>>Customer</option>
-                                    <option value="verification" <?= $user['role'] === 'verification' ? 'selected' : '' ?>>Verification</option>
-                                    <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                                    <option value="readonly" <?= $user['role'] === 'readonly' ? 'selected' : '' ?>>👁️ Readonly</option>
+                                    <option value="customer" <?= $user['role'] === 'customer' ? 'selected' : '' ?>>👤 Customer</option>
+                                    <option value="verification" <?= $user['role'] === 'verification' ? 'selected' : '' ?>>✅ Verification</option>
+                                    <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>⚙️ Admin</option>
                                 </select>
                                 <button type="submit" name="update_role">Update</button>
                             </form>

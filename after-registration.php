@@ -17,11 +17,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Validate inputs
     if ($password !== $passwordAgain) {
-        die("Passwords do not match");
+        $database->closeConnection();
+        Url::redirectUrl("/projekt_weby/registration-form.php?error=password_mismatch");
+        exit;
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die("Invalid email format");
+        $database->closeConnection();
+        Url::redirectUrl("/projekt_weby/registration-form.php?error=invalid_email");
+        exit;
     }
 
     // Create user with default 'readonly' role
@@ -42,9 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     } else {
         $database->closeConnection();
-        die("User creation failed. Email may already be in use.");
+        Url::redirectUrl("/projekt_weby/registration-form.php?error=email_exists");
+        exit;
     }
 } else {
-    die("Unauthorized access");
+    Url::redirectUrl("/projekt_weby/registration-form.php?error=unauthorized");
+    exit;
 }
 ?>
