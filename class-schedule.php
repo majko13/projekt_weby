@@ -284,6 +284,97 @@ $database->closeConnection();
                 ?>
             </div>
 
+            <!-- Mobile Day List (visible only on mobile) -->
+            <div class="mobile-day-list">
+                <?php
+                // Generate mobile day list for current month
+                for ($day = 1; $day <= $days_in_month; $day++) {
+                    $current_date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                    $day_of_week = date('N', strtotime($current_date));
+                    $is_weekend = ($day_of_week == 6 || $day_of_week == 7);
+                    $is_past = strtotime($current_date) < strtotime(date('Y-m-d'));
+
+                    // Check reservation status
+                    $status = '';
+                    $reserved_by_me = false;
+                    if (isset($reservations[$current_date])) {
+                        $status = $reservations[$current_date]['status'];
+                        $reserved_by_me = ($reservations[$current_date]['user_id'] == $_SESSION['logged_in_user_id']);
+                    }
+
+                    // Determine cell class
+                    $cell_class = 'day-cell';
+                    if ($is_past) {
+                        $cell_class .= ' past-day';
+                    } elseif ($is_weekend) {
+                        $cell_class .= ' weekend-day';
+                    } elseif ($status === 'approved') {
+                        if ($_SESSION['user_role'] === 'customer' && $reserved_by_me) {
+                            $cell_class .= ' my-approved-reservation';
+                        } else {
+                            $cell_class .= ' reservation-booked';
+                        }
+                    } elseif ($status === 'pending') {
+                        if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification') {
+                            $cell_class .= ' pending-approval';
+                        } elseif ($_SESSION['user_role'] === 'customer' && $reserved_by_me) {
+                            $cell_class .= ' pending-approval';
+                        } else {
+                            $cell_class .= ' reservation-available';
+                        }
+                    } else {
+                        $cell_class .= ' reservation-available';
+                    }
+
+                    echo '<div class="' . $cell_class . '">';
+                    echo '<div class="day-number">' . $day . '</div>';
+                    echo '<div class="day-info">';
+                    echo '<div class="day-name">' . date('l', strtotime($current_date)) . '</div>';
+
+                    // Display status info
+                    if ($status === 'approved') {
+                        if ($_SESSION['user_role'] === 'customer' && $reserved_by_me) {
+                            echo '<div class="reservation-info">Approved</div>';
+                        } else {
+                            echo '<div class="reservation-info">Booked</div>';
+                        }
+                    } elseif ($status === 'pending' && ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification')) {
+                        echo '<div class="reservation-info">Pending</div>';
+                    } elseif ($status === 'pending' && $_SESSION['user_role'] === 'customer' && $reserved_by_me) {
+                        echo '<div class="reservation-info">Pending</div>';
+                    } elseif ($is_weekend) {
+                        echo '<div class="reservation-info">Closed</div>';
+                    } elseif ($_SESSION['user_role'] === 'readonly' && !$is_past && !$is_weekend && ($status === '' || ($status === 'pending' && !$reserved_by_me))) {
+                        echo '<div class="reservation-info">Available</div>';
+                    }
+
+                    echo '</div>'; // Close day-info
+
+                    echo '<div class="day-actions">';
+                    // Reserve button - show for available days only
+                    if (!$is_past && !$is_weekend && ($_SESSION['user_role'] === 'customer' || $_SESSION['user_role'] === 'admin')) {
+                        if ($status === '' || ($status === 'pending' && $_SESSION['user_role'] === 'customer' && !$reserved_by_me)) {
+                            echo '<form method="POST" action="class-schedule.php" class="reservation-form">';
+                            echo '<input type="hidden" name="class_id" value="' . $class_id . '">';
+                            echo '<input type="hidden" name="reserve_date" value="' . $current_date . '">';
+                            echo '<button type="submit" class="reserve-btn">Request</button>';
+                            echo '</form>';
+                        }
+                    }
+
+                    // Admin "View Day" button
+                    if (($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'verification') &&
+                        !$is_weekend && !$is_past &&
+                        ($status === '' || $status === 'approved' || $status === 'pending')) {
+                        echo '<a href="day-reservations.php?class_id=' . $class_id . '&date=' . $current_date . '" class="view-day-btn">View</a>';
+                    }
+                    echo '</div>'; // Close day-actions
+
+                    echo '</div>'; // Close day-cell
+                }
+                ?>
+            </div>
+
             <!-- Calendar Legend -->
             <div class="calendar-legend">
                 <h3>📅 Calendar Status Guide</h3>

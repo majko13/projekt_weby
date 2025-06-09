@@ -299,6 +299,10 @@ p {
     color: #6c757d;
     line-height: 1.6;
     margin-bottom: 20px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
 
 .class-actions {
@@ -514,10 +518,18 @@ td {
     color: #333;
 }
 
-.schedule-header .description {
-    margin: 0;
+.schedule-header .description,
+.schedule-header p.description {
+    margin: 0 100px 0 0;
     font-size: 1.1em;
     color: #666;
+    text-align: left;
+    width: auto;
+    padding-left: 0;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.6;
+    max-width: 70%;
 }
 
 /* Calendar Header */
@@ -528,12 +540,17 @@ td {
     margin-bottom: 20px;
 }
 
-/* Calendar Grid */
+/* Calendar Grid - Desktop only */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
+    gap: 6px;
     padding-top: 5px;
+}
+
+/* Mobile day list - Hidden on desktop */
+.mobile-day-list {
+    display: none;
 }
 
 .day-header {
@@ -546,8 +563,8 @@ td {
 /* Day Cells */
 .day-cell {
     border: 1px solid #ddd;
-    min-height: 120px;
-    padding: 15px 10px;
+    min-height: 160px;
+    padding: 12px 8px;
     position: relative;
     cursor: pointer;
     transition: all 0.2s;
@@ -1192,6 +1209,16 @@ td {
     font-size: 1.3em;
 }
 
+.classes-container .class-card p {
+    color: #6c757d;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
 /* ===== REGISTRATION FORM STYLES ===== */
 
 .registration-form {
@@ -1830,13 +1857,13 @@ td {
     }
 
     .header-brand h1 {
-        font-size: 3em;
+        font-size: 3.5em;
         font-weight: bold;
     }
 
     .header-brand .header-subtitle {
-        font-size: 1.6em;
-        font-weight: 500;
+        font-size: 1.2em;
+        font-weight: 400;
     }
 
     .nav-list {
@@ -1845,10 +1872,10 @@ td {
     }
 
     .nav-link {
-        padding: 18px 22px;
-        font-size: 1.8em;
+        padding: 22px 26px;
+        font-size: 2.5em;
         font-weight: 600;
-        min-height: 56px;
+        min-height: 70px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1863,81 +1890,214 @@ td {
 
     .user-info {
         flex-direction: column;
-        gap: 14px;
+        gap: 10px;
         margin-left: 0;
         padding-left: 0;
         border-left: none;
         border-top: 1px solid rgba(255, 255, 255, 0.2);
-        padding-top: 18px;
-        font-size: 1.3em;
+        padding-top: 15px;
+        font-size: 0.9em;
     }
 
     .user-name {
-        font-size: 1.4em;
-        font-weight: 600;
+        font-size: 1em;
+        font-weight: 500;
     }
 
     .user-role {
-        font-size: 1.3em;
-        font-weight: 500;
+        font-size: 0.9em;
+        font-weight: 400;
+    }
+
+    /* Logout button smaller */
+    .user-info .nav-link {
+        font-size: 1em;
+        padding: 10px 14px;
+        min-height: 40px;
     }
 
     /* Calendar Mobile */
     .calendar {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        margin: 0 -10px;
-        padding: 0 10px;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
     }
 
     .calendar-grid {
-        min-width: 650px;
-        gap: 8px;
+        display: none;
+    }
+
+    /* Hide day headers on mobile */
+    .day-header {
+        display: none;
+    }
+
+    /* Hide empty cells on mobile */
+    .empty-cell {
+        display: none;
+    }
+
+    /* Mobile day list - only visible on mobile */
+    .mobile-day-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+
+    .mobile-day-list .day-cell {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 450px;
+        padding: 15px;
+        margin: 0 auto 10px auto;
+        border-radius: 12px;
+        font-size: 1em;
+        min-height: 60px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .mobile-day-list .day-info {
+        flex: 1;
+        margin-left: 15px;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .mobile-day-list .day-name {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mobile-day-list .day-actions {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        flex-shrink: 0;
+        margin-left: 10px;
+        align-items: baseline;
+        justify-content: flex-end;
+        min-width: 136px;
+        height: 36px;
+    }
+
+    /* Center single button when only one is present */
+    .mobile-day-list .day-actions:has(:only-child) {
+        justify-content: center;
+    }
+
+    /* Fallback for browsers that don't support :has() */
+    .mobile-day-list .day-cell:not(:has(.reserve-btn)) .day-actions,
+    .mobile-day-list .day-cell:not(:has(.view-day-btn)) .day-actions {
+        justify-content: center;
+    }
+
+    .mobile-day-list .reserve-btn,
+    .mobile-day-list .view-day-btn {
+        height: 36px;
+        width: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75em;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        border: none;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+        position: relative;
+        top: 0;
+    }
+
+    /* Responsive adjustments for different mobile sizes */
+    @media screen and (max-width: 480px) {
+        .mobile-day-list {
+            padding: 0 8px;
+        }
+
+        .mobile-day-list .day-cell {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.9em;
+            min-height: 55px;
+        }
+    }
+
+    @media screen and (max-width: 360px) {
+        .mobile-day-list {
+            padding: 0 5px;
+        }
+
+        .mobile-day-list .day-cell {
+            width: 100%;
+            padding: 10px;
+            font-size: 0.85em;
+            min-height: 50px;
+        }
     }
 
     .day-cell {
-        min-height: 100px;
-        padding: 12px 8px;
-        font-size: 1em;
+        min-height: 60px;
+        padding: 4px 3px;
+        font-size: 0.8em;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .day-number {
-        font-size: 1.4em;
-        margin-bottom: 6px;
+        font-size: 1em;
+        margin-bottom: 1px;
         font-weight: bold;
         text-align: center;
     }
 
     .reservation-info {
-        font-size: 1em;
-        padding: 5px 8px;
-        margin-top: 6px;
+        font-size: 0.7em;
+        padding: 1px 3px;
+        margin-top: 1px;
         text-align: center;
+        line-height: 1.1;
     }
 
     .reserve-btn {
-        padding: 8px 12px;
-        font-size: 0.95em;
+        padding: 3px 4px;
+        font-size: 0.65em;
         font-weight: bold;
         width: 100%;
-        margin-top: 6px;
-        min-height: 36px;
+        margin-top: 1px;
+        min-height: 20px;
+        line-height: 1;
     }
 
     .view-day-btn {
-        padding: 8px 12px;
-        font-size: 0.95em;
-        height: 36px;
+        padding: 3px 4px;
+        font-size: 0.65em;
+        height: 20px;
         line-height: 1;
         font-weight: bold;
         width: 100%;
-        margin-top: 6px;
+        margin-top: 1px;
     }
 
     /* Schedule Header Mobile */
     .schedule-header h1 {
         font-size: 2em;
         margin-bottom: 10px;
+        text-align: center;
     }
 
     .schedule-header .description {
@@ -1945,8 +2105,14 @@ td {
         margin-bottom: 15px;
     }
 
+    .calendar-header {
+        text-align: center;
+    }
+
     .calendar-header h2 {
         font-size: 1.6em;
+        text-align: center;
+        margin: 0 auto;
     }
 
     /* Day Headers Mobile */
@@ -2115,13 +2281,60 @@ td {
     /* Month Navigation Mobile */
     .month-nav {
         flex-direction: column;
-        gap: 12px;
-        margin: 20px 0;
+        gap: 10px;
+        margin: 15px 0;
+        padding: 0 10px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .month-nav .btn {
         width: 100%;
-        padding: 14px;
+        padding: 12px;
+        font-size: 1em;
+        font-weight: 600;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        transition: all 0.3s ease;
+        text-align: center;
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .month-nav .btn:hover,
+    .month-nav .btn:active {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+    }
+
+    /* Month Navigation - Small Mobile */
+    @media screen and (max-width: 480px) {
+        .month-nav {
+            padding: 0 8px;
+            gap: 8px;
+        }
+
+        .month-nav .btn {
+            padding: 10px;
+            font-size: 0.95em;
+            min-height: 40px;
+        }
+    }
+
+    @media screen and (max-width: 360px) {
+        .month-nav {
+            padding: 0 5px;
+            gap: 6px;
+        }
+
+        .month-nav .btn {
+            padding: 8px;
+            font-size: 0.9em;
+            min-height: 36px;
+        }
     }
 
     /* Modal Mobile */
@@ -2192,37 +2405,43 @@ td {
     }
 
     .calendar-grid {
-        min-width: 500px;
-        gap: 3px;
+        display: none;
     }
 
     .day-cell {
-        min-height: 75px;
-        padding: 6px 4px;
-        font-size: 0.8em;
+        min-height: 60px;
+        padding: 3px 2px;
+        font-size: 0.75em;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .day-number {
         font-size: 0.9em;
         font-weight: bold;
+        margin-bottom: 1px;
     }
 
     .reservation-info {
-        font-size: 0.75em;
-        padding: 2px 4px;
+        font-size: 0.65em;
+        padding: 1px 2px;
+        line-height: 1.1;
     }
 
     .reserve-btn {
-        padding: 3px 6px;
-        font-size: 0.7em;
+        padding: 2px 4px;
+        font-size: 0.6em;
         font-weight: bold;
+        min-height: 18px;
+        line-height: 1;
     }
 
     .view-day-btn {
-        padding: 4px 6px;
-        font-size: 0.7em;
-        height: 24px;
-        line-height: 12px;
+        padding: 2px 4px;
+        font-size: 0.6em;
+        height: 18px;
+        line-height: 1;
         font-weight: bold;
     }
 
