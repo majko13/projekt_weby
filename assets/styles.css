@@ -1,9 +1,9 @@
-/* Global App Styling */
+/* Essential Global Styling */
 body {
     font-family: "Times New Roman", Times, serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: #f5f7fa;
     min-height: 100vh;
     line-height: 1.6;
     color: #333;
@@ -13,22 +13,9 @@ main {
     background: white;
     margin: 20px auto;
     max-width: 1200px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     padding: 30px;
-    position: relative;
-    overflow: hidden;
-}
-
-main::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #007bff, #28a745, #ffc107, #dc3545);
-    z-index: 1;
 }
 
 /* Enhanced Content Sections */
@@ -86,171 +73,58 @@ p {
     color: #666;
 }
 
-/* Enhanced Alert Styling */
+/* Essential Alert Styling */
 .alert {
-    padding: 20px 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
     font-weight: bold;
     text-align: center;
-    border: 2px solid;
-    position: relative;
-    overflow: hidden;
-    font-size: 1.1em;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.alert::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    z-index: 1;
+    border: 1px solid;
 }
 
 .alert.success {
-    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    background: #d4edda;
     color: #155724;
     border-color: #28a745;
 }
 
-.alert.success::before {
-    background: linear-gradient(90deg, #28a745, #20c997);
-}
-
-.alert.success::after {
-    content: "✅";
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.5em;
-}
-
 .alert.error {
-    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    background: #f8d7da;
     color: #721c24;
     border-color: #dc3545;
 }
 
-.alert.error::before {
-    background: linear-gradient(90deg, #dc3545, #c82333);
-}
-
-.alert.error::after {
-    content: "❌";
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.5em;
-}
-
-.alert.warning {
-    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-    color: #856404;
-    border-color: #ffc107;
-}
-
-.alert.warning::before {
-    background: linear-gradient(90deg, #ffc107, #e6ac00);
-}
-
-.alert.warning::after {
-    content: "⚠️";
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.5em;
-}
-
-.alert.info {
-    background: linear-gradient(135deg, #d1ecf1, #bee5eb);
-    color: #0c5460;
-    border-color: #17a2b8;
-}
-
-.alert.info::before {
-    background: linear-gradient(90deg, #17a2b8, #138496);
-}
-
-.alert.info::after {
-    content: "ℹ️";
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.5em;
-}
-
-/* Enhanced Button Styling */
+/* Essential Button Styling */
 .btn {
-    background: linear-gradient(135deg, #007bff, #0056b3);
+    background: #007bff;
     color: white;
-    border: 2px solid #007bff;
-    padding: 12px 20px;
-    border-radius: 8px;
+    border: 1px solid #007bff;
+    padding: 10px 15px;
+    border-radius: 5px;
     text-decoration: none;
     font-weight: bold;
-    transition: all 0.3s;
     font-size: 1em;
     cursor: pointer;
     display: inline-block;
     font-family: "Times New Roman", Times, serif;
     text-align: center;
-    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.btn::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s;
-}
-
-.btn:hover::before {
-    left: 100%;
 }
 
 .btn:hover {
-    background: linear-gradient(135deg, #0056b3, #004085);
+    background: #0056b3;
     border-color: #0056b3;
     text-decoration: none;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
 }
 
 .btn.danger {
-    background: linear-gradient(135deg, #dc3545, #c82333);
+    background: #dc3545;
     border-color: #dc3545;
-    box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
 }
 
 .btn.danger:hover {
-    background: linear-gradient(135deg, #c82333, #a71e2a);
+    background: #c82333;
     border-color: #bd2130;
-    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
-}
-
-.btn.success {
-    background: linear-gradient(135deg, #28a745, #1e7e34);
-    border-color: #28a745;
-    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
-}
-
-.btn.success:hover {
-    background: linear-gradient(135deg, #1e7e34, #155724);
-    border-color: #1e7e34;
-    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
 }
 
 /* Enhanced Class Grid */
@@ -1753,6 +1627,17 @@ td {
         font-size: 0.9em;
     }
 
+    /* Header Icons Tablet - Same Size */
+    .nav-icon {
+        font-size: 1.5em !important;
+        margin-right: 10px;
+        width: 1.5em;
+        height: 1.5em;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     /* Schedule Typography Tablet */
     .schedule-header h1 {
         font-size: 1.8em;
@@ -2374,13 +2259,29 @@ td {
 
     /* Admin Panel Mobile */
     .admin-actions {
-        padding: 15px;
-        margin: 20px 0;
+        padding: 20px 15px;
+        margin: 20px auto;
+        max-width: 400px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
     }
 
     .admin-actions .btn {
         width: 100%;
+        max-width: 300px;
         min-width: auto;
+        padding: 16px 20px;
+        font-size: 1.2em;
+        font-weight: 600;
+        border-radius: 10px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 50px;
     }
 }
 

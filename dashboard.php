@@ -26,13 +26,7 @@ if (!$user) {
 // Set role in session if not already set
 $_SESSION['role'] = $user['role'] ?? 'readonly';
 
-// Check role after it's properly set
-if ($_SESSION["role"] === 'readonly') {
-    // Show limited functionality
-    echo "<p>Your account is readonly. Please contact admin for full access.</p>";
-} elseif ($_SESSION["role"] === 'customer') {
-    // Show customer features
-} // etc.
+// Role is set and will be used for popup modal if needed
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -52,11 +46,7 @@ if ($_SESSION["role"] === 'readonly') {
                 <p class="description">You are successfully logged in to the Class Reservation System</p>
             </div>
 
-            <?php if ($_SESSION["role"] === 'readonly'): ?>
-                <div class="alert warning">
-                    <strong>Limited Access:</strong> Your account is readonly. Please contact admin for full access.
-                </div>
-            <?php endif; ?>
+
 
             <div class="dashboard-grid">
                 <div class="dashboard-card">
@@ -87,6 +77,55 @@ if ($_SESSION["role"] === 'readonly') {
             </div>
         </section>
     </main>
+
+    <!-- Read-only Account Popup Modal -->
+    <?php if ($_SESSION["role"] === 'readonly'): ?>
+    <div id="readonlyModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">⚠️ Limited Access Account</div>
+            <div class="modal-message">
+                <p><strong>Your account is read-only.</strong></p>
+                <p>You can view content but cannot make reservations or modifications.</p>
+                <p>Please contact an administrator for full access privileges.</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-confirm" id="closeReadonlyModal">
+                    ✓ I Understand
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show read-only popup on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('readonlyModal');
+            const closeBtn = document.getElementById('closeReadonlyModal');
+
+            // Show modal
+            modal.style.display = 'flex';
+
+            // Close modal when button is clicked
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    <?php endif; ?>
 
     <?php require "assets/footer.php"; ?>
 </body>
