@@ -1,0 +1,170 @@
+REZERVACE TŘÍD - SYSTÉM PRO REZERVACI UČEBEN
+===========================================
+
+📋 PŘEHLED PROJEKTU
+• Webová aplikace pro rezervaci učeben a tříd
+• Profesionální platforma pro správu rezervací
+• Responzivní design pro mobilní zařízení a tablety
+• Vícejazyčná podpora (čeština/angličtina)
+
+🎯 HLAVNÍ ÚČEL
+• Zjednodušení procesu rezervace učeben
+• Centralizovaná správa všech rezervací
+• Real-time zobrazení dostupnosti
+• Automatizace schvalovacího procesu
+
+⚙️ TECHNICKÉ SPECIFIKACE
+• Backend: PHP 8.2+
+• Databáze: MySQL/MariaDB
+• Frontend: HTML5, CSS3, JavaScript
+• Server: Apache (XAMPP)
+• Architektura: MVC pattern
+• Bezpečnost: Password hashing, Session management
+
+🗄️ DATABÁZOVÁ STRUKTURA
+• Tabulka users - správa uživatelů a rolí
+• Tabulka classes - informace o učebnách
+• Tabulka class_reservations - rezervace s workflow
+• Relační vazby s foreign keys
+• Indexy pro optimalizaci výkonu
+
+👥 UŽIVATELSKÉ ROLE
+• ADMIN - plná správa systému
+  - Správa uživatelů a jejich rolí
+  - Přidávání/editace/mazání učeben
+  - Schvalování/zamítání rezervací
+  - Přístup k admin panelu
+
+• VERIFICATION - schvalovací role
+  - Schvalování/zamítání rezervací
+  - Zobrazení pending rezervací
+  - Omezený admin přístup
+
+• CUSTOMER - zákazník
+  - Vytváření rezervací
+  - Zobrazení vlastních rezervací
+  - Prohlížení kalendáře dostupnosti
+
+• READONLY - pouze čtení
+  - Prohlížení obsahu bez možnosti rezervace
+  - Omezený přístup k funkcionalitě
+
+🔧 KLÍČOVÉ FUNKCIONALITY
+
+📅 Kalendářový systém
+• Vizuální kalendář s barevným kódováním
+• Zelená - dostupné termíny
+• Žlutá - čekající na schválení (pending)
+• Červená - rezervované/víkendy
+• Šedá - minulé termíny/nedostupné
+
+📝 Rezervační proces
+• Jednoduché vytvoření rezervace kliknutím
+• Automatický status "pending" pro nové rezervace
+• Notifikace o úspěšném vytvoření žádosti
+• Workflow schvalování administrátory
+
+✅ Schvalovací systém
+• Admin/verification uživatelé schvalují rezervace
+• Automatické mazání ostatních pending žádostí při schválení
+• Možnost zamítnutí rezervace s důvodem
+• Historie všech akcí
+
+🏢 Správa učeben
+• Přidávání nových učeben (admin)
+• Editace parametrů učeben
+• Mazání nepoužívaných učeben
+• Kapacita a popis učeben
+
+👤 Správa uživatelů
+• Registrace nových uživatelů
+• Změna rolí uživatelů (admin)
+• Autentifikace a autorizace
+• Bezpečné ukládání hesel
+
+📱 RESPONZIVNÍ DESIGN
+• Optimalizace pro mobilní zařízení
+• Větší fonty pro lepší čitelnost na mobilu
+• Přizpůsobivé rozložení kalendáře
+• Touch-friendly ovládací prvky
+• Horizontální scrollování eliminováno
+
+🎨 UŽIVATELSKÉ ROZHRANÍ
+• Moderní a čistý design
+• Gradient pozadí a zaoblené rohy
+• Konzistentní styling napříč aplikací
+• Times New Roman font pro profesionální vzhled
+• Intuitivní navigace
+
+🔒 BEZPEČNOSTNÍ PRVKY
+• Hashování hesel pomocí PHP password_hash()
+• Session management pro autentifikaci
+• SQL injection prevence pomocí prepared statements
+• Input sanitizace a validace
+• Role-based access control (RBAC)
+
+📊 SPRÁVA STAVU REZERVACÍ
+• PENDING - čeká na schválení
+• APPROVED - schváleno a rezervováno
+• REJECTED - zamítnuto administrátorem
+• Automatické workflow přechodů
+
+🌐 STRUKTURA SOUBORŮ
+• /assets - styly a společné komponenty
+• /classes - PHP třídy (Database, User, Class)
+• /admin - administrátorské funkce
+• /databaze - SQL skripty a zálohy
+• /js - JavaScript funkcionality
+
+📈 VÝHODY SYSTÉMU
+• Eliminace konfliktů v rezervacích
+• Transparentní proces schvalování
+• Centralizovaná evidence všech rezervací
+• Snížení administrativní zátěže
+• Real-time aktualizace dostupnosti
+• Audit trail všech akcí
+
+🚀 MOŽNÁ ROZŠÍŘENÍ
+• Email notifikace pro uživatele
+• Export rezervací do kalendářních aplikací
+• Reporting a statistiky využití
+• API pro integraci s jinými systémy
+• Mobilní aplikace
+• Pokročilé filtry a vyhledávání
+
+💡 TECHNICKÉ INOVACE
+• Objektově orientovaný přístup
+• Separation of concerns
+• Reusable komponenty
+• Clean code principles
+• Error handling a logging
+
+🎯 CÍLOVÁ SKUPINA
+• Vzdělávací instituce
+• Korporátní prostředí
+• Coworkingové prostory
+• Konferenční centra
+• Jakákoliv organizace s potřebou rezervace místností
+
+📋 TESTOVÁNÍ A KVALITA
+• Manuální testování všech funkcionalit
+• Cross-browser kompatibilita
+• Responsive design testing
+• Security testing
+• Performance optimization
+
+🔄 WORKFLOW REZERVACE
+1. Uživatel si vybere učebnu a datum
+2. Systém vytvoří rezervaci se statusem "pending"
+3. Admin/verification uživatel obdrží notifikaci
+4. Rezervace je schválena nebo zamítnuta
+5. Uživatel je informován o výsledku
+6. Schválená rezervace se zobrazí jako "booked"
+
+📞 KONTAKTNÍ INFORMACE
+• Email: info@rezervace-trid.cz
+• Telefon: +420 123 456 789
+• Technická podpora: Dostupná pro všechny uživatele
+
+🏆 ZÁVĚR
+Systém Rezervace Tříd představuje moderní, bezpečné a uživatelsky přívětivé řešení pro správu rezervací učeben. Kombinuje jednoduchost použití s pokročilými funkcemi pro administrátory, čímž poskytuje kompletní nástroj pro efektivní správu prostorů.

@@ -208,5 +208,72 @@ class ClassItem {
         return $stmt->execute(['id' => $reservation_id]);
     }
 
+    // Database cleanup methods for reservations
+    public static function deleteReservationsBeforeDate($connection, $date) {
+        $sql = "DELETE FROM class_reservations WHERE date < :date";
+        $stmt = $connection->prepare($sql);
+        return $stmt->execute(['date' => $date]);
+    }
+
+    public static function deleteReservationsAfterDate($connection, $date) {
+        $sql = "DELETE FROM class_reservations WHERE date > :date";
+        $stmt = $connection->prepare($sql);
+        return $stmt->execute(['date' => $date]);
+    }
+
+    public static function deleteReservationsOnDate($connection, $date) {
+        $sql = "DELETE FROM class_reservations WHERE DATE(date) = :date";
+        $stmt = $connection->prepare($sql);
+        return $stmt->execute(['date' => $date]);
+    }
+
+    public static function deleteReservationsInDateRange($connection, $start_date, $end_date) {
+        $sql = "DELETE FROM class_reservations WHERE date BETWEEN :start_date AND :end_date";
+        $stmt = $connection->prepare($sql);
+        return $stmt->execute([
+            'start_date' => $start_date,
+            'end_date' => $end_date
+        ]);
+    }
+
+    public static function deleteReservationsOlderThanDays($connection, $days) {
+        $sql = "DELETE FROM class_reservations WHERE date < DATE_SUB(NOW(), INTERVAL :days DAY)";
+        $stmt = $connection->prepare($sql);
+        return $stmt->execute(['days' => $days]);
+    }
+
+    public static function deleteReservationsByStatus($connection, $status, $before_date = null) {
+        if ($before_date) {
+            $sql = "DELETE FROM class_reservations WHERE status = :status AND date < :date";
+            $stmt = $connection->prepare($sql);
+            return $stmt->execute(['status' => $status, 'date' => $before_date]);
+        } else {
+            $sql = "DELETE FROM class_reservations WHERE status = :status";
+            $stmt = $connection->prepare($sql);
+            return $stmt->execute(['status' => $status]);
+        }
+    }
+
+    public static function countReservationsBeforeDate($connection, $date) {
+        $sql = "SELECT COUNT(*) as count FROM class_reservations WHERE date < :date";
+        $stmt = $connection->prepare($sql);
+        $stmt->execute(['date' => $date]);
+        $result = $stmt->fetch();
+        return $result['count'];
+    }
+
+    public static function getReservationsBeforeDate($connection, $date, $limit = 100) {
+        $sql = "SELECT reservation_id, class_id, user_id, date, status, created_at
+                FROM class_reservations
+                WHERE date < :date
+                ORDER BY date ASC
+                LIMIT :limit";
+        $stmt = $connection->prepare($sql);
+        $stmt->bindValue(':date', $date, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
 ?>

@@ -32,6 +32,13 @@ if ($_SESSION["user_role"] === 'admin' || $_SESSION["user_role"] === 'verificati
     </div>';
 }
 
+// Add cleanup link for admin users only
+if ($_SESSION["user_role"] === 'admin') {
+    $cleanup_link = '<div class="admin-actions">
+        <a href="admin/cleanup-reservations.php" class="btn" style="background: #dc3545; margin-left: 10px;">Database Cleanup</a>
+    </div>';
+}
+
 // Get all users
 $users = User::getAllUsers($connection);
 $database->closeConnection();
@@ -61,6 +68,7 @@ $database->closeConnection();
             <?php endif; ?>
 
             <?php if (isset($verification_link)) echo $verification_link; ?>
+            <?php if (isset($cleanup_link)) echo $cleanup_link; ?>
 
             <table>
                 <thead>
